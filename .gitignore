@@ -8,3 +8,9 @@ Desktop.ini
 
 # Dependencies
 node_modules/
+
+# Environment variables & secrets
+.env
+.env.local
+.env.*.local
+*.env
