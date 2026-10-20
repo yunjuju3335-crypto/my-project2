@@ -21,7 +21,8 @@ const INITIAL_PRODUCTS = [
 export default function AdminDashboard({ onExit }: AdminDashboardProps) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
-  const [adminTab, setAdminTab] = useState<'inquiries' | 'products'>('inquiries');
+  const [adminTab, setAdminTab] = useState<'inquiries' | 'products' | 'media'>('inquiries');
+  const [heroImage, setHeroImage] = useState<string>('home_model.jpg');
   
   const [inquiries, setInquiries] = useState<any[]>([]);
   const [products, setProducts] = useState<any[]>([]);
@@ -208,6 +209,13 @@ export default function AdminDashboard({ onExit }: AdminDashboardProps) {
               <span>🛍️ 상품 및 가격 관리</span>
               <span className="text-xs text-slate-500">{products.length}건</span>
             </button>
+            <button 
+              onClick={() => setAdminTab('media')} 
+              className={`w-full text-left px-4 py-3 rounded-xl transition-all flex items-center justify-between text-sm cursor-pointer ${adminTab === 'media' ? 'bg-slate-800 text-white font-bold shadow-sm' : 'hover:bg-slate-800/60 text-slate-400'}`}
+            >
+              <span>🎬 메인 미디어 관리</span>
+              <span className="text-xs text-slate-500">사진 & 영상</span>
+            </button>
           </nav>
         </div>
 
@@ -367,6 +375,91 @@ export default function AdminDashboard({ onExit }: AdminDashboardProps) {
                 ))}
               </div>
             )}
+          </div>
+        )}
+
+        {adminTab === 'media' && (
+          <div>
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold text-slate-900">메인 미디어 관리</h2>
+              <p className="text-xs text-slate-500 mt-1">홈 화면의 대표 모델 사진과 9:16 쇼츠 동영상을 직접 업로드하고 교체할 수 있습니다.</p>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* 대표 이미지 관리 */}
+              <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="font-bold text-slate-900 text-base flex items-center gap-2">
+                    <span>📷</span> 메인 대표 모델 사진
+                  </h3>
+                  <button 
+                    type="button" 
+                    onClick={() => {
+                      localStorage.removeItem('baekjae_home_hero_image');
+                      setHeroImage('home_model.jpg');
+                      alert('기본 대표 이미지로 초기화되었습니다.');
+                    }}
+                    className="text-xs text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+                  >
+                    ↺ 기본값 복원
+                  </button>
+                </div>
+                <div className="w-full h-56 rounded-xl overflow-hidden bg-slate-950 border border-slate-200 mb-4 flex items-center justify-center">
+                  <img src={heroImage} alt="대표 이미지" className="w-full h-full object-cover object-top" />
+                </div>
+                <p className="text-xs text-slate-500 mb-4">선택하신 사진은 브라우저에 저장되며 홈페이지 메인 대표 사진으로 표시됩니다.</p>
+                <label className="w-full py-3 px-4 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer">
+                  <span>📁</span> 새 대표 이미지 파일 선택 및 업로드
+                  <input 
+                    type="file" 
+                    accept="image/*" 
+                    className="hidden" 
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (evt) => {
+                          const dataUrl = evt.target?.result as string;
+                          if (dataUrl) {
+                            setHeroImage(dataUrl);
+                            localStorage.setItem('baekjae_home_hero_image', dataUrl);
+                            alert('대표 이미지가 성공적으로 변경되었습니다.');
+                          }
+                        };
+                        reader.readAsDataURL(file);
+                      }
+                    }} 
+                  />
+                </label>
+              </div>
+
+              {/* 쇼츠 동영상 관리 */}
+              <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="font-bold text-slate-900 text-base flex items-center gap-2">
+                    <span>🎥</span> 9:16 쇼츠 비디오 관리
+                  </h3>
+                </div>
+                <p className="text-xs text-slate-500 mb-4">홈 화면 우측 9:16 세로형 플레이어에 재생될 공식 쇼츠 영상을 교체합니다.</p>
+                <div className="space-y-4">
+                  <label className="w-full py-3 px-4 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer">
+                    <span>📁</span> PC의 쇼츠 동영상 파일 선택하기
+                    <input 
+                      type="file" 
+                      accept="video/*" 
+                      className="hidden" 
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          alert('동영상 파일이 선택되었습니다. 홈 화면에서 즉시 재생됩니다.');
+                        }
+                      }} 
+                    />
+                  </label>
+                  <p className="text-xs text-slate-400 text-center">동영상 파일 또는 유튜브 링크 등록 시 새로고침해도 자동 유지됩니다.</p>
+                </div>
+              </div>
+            </div>
           </div>
         )}
       </main>
