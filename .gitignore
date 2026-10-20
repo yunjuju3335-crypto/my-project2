@@ -5,3 +5,6 @@ Desktop.ini
 
 # Logs & scratch
 *.log
+
+# Dependencies
+node_modules/
