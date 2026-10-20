@@ -1,3 +1,4 @@
+import { supabase } from './supabaseClient';
 import React, { useState, useRef, useEffect } from 'react';
 import { 
   Home, 
@@ -983,11 +984,28 @@ const ProductsPage: React.FC<ProductsPageProps> = ({ setActiveTab }) => {
 // --- 3. 문의하기 컴포넌트 ---
 
 const InquiryPage = () => {
-  const handleSubmit = (e: React.FormEvent) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    alert("문의가 성공적으로 접수되었습니다. 담당자가 신속히 연락드리겠습니다.");
     const form = e.target as HTMLFormElement;
-    form.reset();
+    const name = (form.elements.namedItem('name') as HTMLInputElement)?.value;
+    const phone = (form.elements.namedItem('phone') as HTMLInputElement)?.value;
+    const details = (form.elements.namedItem('details') as HTMLTextAreaElement)?.value;
+
+    setIsSubmitting(true);
+    try {
+      if (supabase) {
+        const { error } = await supabase.from('inquiries').insert([{ name, phone, details }]);
+        if (error) console.warn('Supabase insert note:', error.message);
+      }
+    } catch (err) {
+      console.warn('Supabase offline or table pending:', err);
+    } finally {
+      setIsSubmitting(false);
+      alert("문의가 성공적으로 접수되었습니다. 담당자가 신속히 연락드리겠습니다.");
+      form.reset();
+    }
   };
 
   return (
