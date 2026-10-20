@@ -1,3 +1,4 @@
+import AdminDashboard from './AdminDashboard';
 import { supabase } from './supabaseClient';
 import React, { useState, useRef, useEffect } from 'react';
 import { 
@@ -1124,6 +1125,10 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  if (activeTab === 'admin') {
+    return <AdminDashboard onExit={() => handleTabChange('home')} />;
+  }
+
   return (
     <div className="min-h-screen bg-slate-50 font-sans flex flex-col">
       {/* 스타일을 위한 커스텀 CSS (앞으로 튀어나오는 탄성 애니메이션 포함) */}
@@ -1254,6 +1259,16 @@ export default function App() {
           </div>
           <div className="border-t border-slate-800 mt-8 pt-8 text-sm text-center md:text-left flex flex-col md:flex-row justify-between">
             <p>© 2026 백재상례복. All rights reserved.</p>
+            <button 
+              type="button" 
+              onClick={() => {
+                setActiveTab('admin');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              className="text-xs text-slate-600 hover:text-slate-400 transition-colors mt-2 md:mt-0 cursor-pointer"
+            >
+              🔒 관리자 모드
+            </button>
             <div className="mt-4 md:mt-0 space-x-4">
               <span className="hover:text-white cursor-pointer">이용약관</span>
               <span className="hover:text-white cursor-pointer">개인정보처리방침</span>
