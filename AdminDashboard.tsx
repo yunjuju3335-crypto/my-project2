@@ -7,15 +7,15 @@ interface AdminDashboardProps {
 
 // 기본 상품 목록 (DB에 상품이 아직 없을 때 1클릭 자동 등록 지원)
 const INITIAL_PRODUCTS = [
-  { id: 'm1', name: '상·하의 양복 (남)', price: '0', category: '남성 상례복' },
-  { id: 'm2', name: '와이셔츠', price: '0', category: '남성 상례복' },
-  { id: 'w1', name: '개량 한복 (여)', price: '0', category: '여성 상례복' },
-  { id: 'am1', name: '완장', price: '0', category: '남성 부자재' },
-  { id: 'am2', name: '넥타이', price: '0', category: '남성 부자재' },
-  { id: 'am3', name: '허리띠', price: '0', category: '남성 부자재' },
-  { id: 'am4', name: '남성 양말', price: '0', category: '남성 부자재' },
-  { id: 'aw1', name: '머리핀', price: '0', category: '여성 부자재' },
-  { id: 'aw2', name: '여성 양말 / 덧신', price: '0', category: '여성 부자재' }
+  { id: 'm1', name: '상·하의 양복 (남)', price: '40,000', category: '남성 상례복' },
+  { id: 'm2', name: '와이셔츠', price: '20,000', category: '남성 상례복' },
+  { id: 'w1', name: '개량 한복 (여)', price: '40,000', category: '여성 상례복' },
+  { id: 'am1', name: '완장', price: '', category: '남성 부자재' },
+  { id: 'am2', name: '넥타이', price: '15,000', category: '남성 부자재' },
+  { id: 'am3', name: '허리띠', price: '20,000', category: '남성 부자재' },
+  { id: 'am4', name: '남성 양말', price: '', category: '남성 부자재' },
+  { id: 'aw1', name: '머리핀', price: '', category: '여성 부자재' },
+  { id: 'aw2', name: '여성 양말 / 덧신', price: '', category: '여성 부자재' }
 ];
 
 export default function AdminDashboard({ onExit }: AdminDashboardProps) {
