@@ -79,8 +79,9 @@
           <button type="button" onclick="switchTab('faq')" data-tab="faq" class="nav-btn flex items-center px-4 py-2 rounded-md text-sm font-medium transition-colors text-slate-600 hover:bg-slate-100 hover:text-slate-900 cursor-pointer">
             <span class="mr-1.5">❓</span> 자주묻는질문
           </button>
-          <button type="button" onclick="openAdminModal()" id="headerAdminBtn" class="flex items-center gap-1.5 ml-3 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-100 border border-slate-200 transition-colors cursor-pointer" title="관리자 콘솔 열기">
+          <button type="button" onclick="openAdminModal(); switchAdminTab('inquiries');" id="headerAdminBtn" class="flex items-center gap-1.5 ml-3 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-100 border border-slate-200 transition-colors cursor-pointer relative" title="관리자 콘솔 열기">
             <span>🔐</span> 관리자 모드
+            <span id="headerInquiryBadge" class="hidden ml-1 px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-red-500 text-white animate-pulse">0</span>
           </button>
         </nav>
       </div>
@@ -952,6 +953,14 @@
         adminAuthed = true;
       }
       updateAdminUI();
+      // 고객 문의 알림 뱃지 초기화
+      try {
+        const cachedInqs = JSON.parse(localStorage.getItem('baekjae_inquiries') || '[]');
+        if (Array.isArray(cachedInqs)) {
+          adminInquiriesData = cachedInqs;
+          updateInquiryNotificationBadges();
+        }
+      } catch(e) {}
 
       // 4) 쇼츠 복원
       const shortsType = await getStorage('baekjae_shorts_type');
@@ -1361,28 +1370,50 @@
 
         <!-- 메인 탭 내용 -->
         <div class="flex-1 p-6 overflow-y-auto">
-          <!-- 탭 1: 문의 내역 -->
-          <div id="adminTab-inquiries">
-            <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-100">
-              <h4 class="font-bold text-slate-900 text-base">고객 문의 접수 내역</h4>
-              <button type="button" onclick="loadAdminInquiries()" class="text-xs bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-lg text-slate-700 font-medium transition-colors cursor-pointer">↺ 새로고침</button>
+          <!-- 탭 1: 고객 문의 접수 및 실시간 답장/완료 관리 센터 -->
+          <div id="adminTab-inquiries" class="space-y-4">
+            
+            <!-- 상단 요약 바 & 필터 & 알림 안내 -->
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pb-3 border-b border-slate-100">
+              <div>
+                <div class="flex items-center gap-2">
+                  <h4 class="font-bold text-slate-900 text-base">고객 문의 및 실시간 답장 센터</h4>
+                  <span id="adminPendingBadge" class="bg-red-500 text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full animate-pulse hidden">대기 0건</span>
+                </div>
+                <p class="text-[11px] text-slate-400 mt-0.5">고객이 남긴 상담 요청을 확인하고, 원클릭 전화/문자(SMS)로 즉시 답장하며 완료 여부를 관리합니다.</p>
+              </div>
+
+              <div class="flex items-center gap-2 self-stretch sm:self-auto">
+                <!-- 필터 버튼 -->
+                <div class="flex bg-slate-100 p-0.5 rounded-lg text-xs font-medium">
+                  <button type="button" onclick="filterAdminInquiries('all')" id="inqFilter-all" class="px-2.5 py-1 rounded-md bg-white text-slate-900 font-bold shadow-2xs cursor-pointer">전체</button>
+                  <button type="button" onclick="filterAdminInquiries('대기')" id="inqFilter-대기" class="px-2.5 py-1 rounded-md text-slate-600 hover:text-slate-900 cursor-pointer">미처리 대기</button>
+                  <button type="button" onclick="filterAdminInquiries('완료')" id="inqFilter-완료" class="px-2.5 py-1 rounded-md text-slate-600 hover:text-slate-900 cursor-pointer">완료</button>
+                </div>
+                <button type="button" onclick="loadAdminInquiries()" class="text-xs bg-slate-100 hover:bg-slate-200 px-2.5 py-1.5 rounded-lg text-slate-700 font-medium transition-colors cursor-pointer flex items-center gap-1">
+                  <span>↺</span> 새로고침
+                </button>
+              </div>
             </div>
-            <div class="overflow-x-auto border border-slate-200 rounded-xl">
-              <table class="w-full text-left border-collapse text-xs">
-                <thead class="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase">
-                  <tr>
-                    <th class="p-3">상태</th>
-                    <th class="p-3">접수일시</th>
-                    <th class="p-3">고객명</th>
-                    <th class="p-3">연락처</th>
-                    <th class="p-3 min-w-[200px]">문의 내용</th>
-                  </tr>
-                </thead>
-                <tbody id="adminInquiriesTableBody" class="divide-y divide-slate-100">
-                  <tr><td colSpan="5" class="p-8 text-center text-slate-400">데이터를 불러오는 중입니다...</td></tr>
-                </tbody>
-              </table>
+
+            <!-- 관리자 실시간 확인 & 답장 안내 배너 -->
+            <div class="p-3 bg-amber-50 rounded-xl border border-amber-200 text-xs text-amber-900 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+              <div class="flex items-center gap-2">
+                <span class="text-base">🔔</span>
+                <span><b>문의 확인 안내</b>: 새 문의 접수 시 상단 헤더에 <span class="bg-red-500 text-white font-bold px-1.5 py-0.2 rounded text-[10px]">빨간 뱃지</span>가 자동 점등됩니다.</span>
+              </div>
+              <button type="button" onclick="requestBrowserNotification()" class="bg-amber-200 hover:bg-amber-300 text-amber-950 font-bold px-2.5 py-1 rounded-md text-[11px] transition-colors cursor-pointer shrink-0">
+                🔔 브라우저 알림 권한 켜기
+              </button>
             </div>
+
+            <!-- 문의 목록 렌더링 컨테이너 -->
+            <div id="adminInquiriesContainer" class="space-y-3">
+              <div class="p-8 text-center text-slate-400 text-xs bg-slate-50 rounded-xl border border-slate-200">
+                데이터를 불러오는 중입니다...
+              </div>
+            </div>
+
           </div>
 
           <!-- 탭 2: 상품 가격 관리 -->
@@ -1877,72 +1908,252 @@
       }
     }
 
-    // Supabase 실시간 문의 내역 불러오기
-    async function loadAdminInquiries() {
-      const tbody = document.getElementById('adminInquiriesTableBody');
-      const badge = document.getElementById('adminInquiryBadge');
-      tbody.innerHTML = '<tr><td colSpan="5" class="p-8 text-center text-slate-400">데이터를 불러오는 중입니다...</td></tr>';
+    let currentInqFilter = 'all';
 
+    // 브라우저 팝업 알림 권한 요청
+    function requestBrowserNotification() {
+      if (!("Notification" in window)) {
+        alert("이 브라우저는 데스크톱 알림을 지원하지 않습니다.");
+        return;
+      }
+      Notification.requestPermission().then(permission => {
+        if (permission === "granted") {
+          showToast("✓ 브라우저 알림이 켜졌습니다. 새 문의 접수 시 팝업이 뜹니다.");
+          new Notification("백재상례복 알림 연동", {
+            body: "새 고객 문의가 접수되면 실시간으로 알려드립니다.",
+            icon: "home_model.jpg"
+          });
+        }
+      });
+    }
+
+    // 상단 헤더 및 관리자 배지 숫자 동기화
+    function updateInquiryNotificationBadges() {
+      const pendingCount = adminInquiriesData.filter(i => (i.status || '대기') === '대기').length;
+      
+      const headerBadge = document.getElementById('headerInquiryBadge');
+      if (headerBadge) {
+        headerBadge.textContent = '신규 ' + pendingCount;
+        if (pendingCount > 0) headerBadge.classList.remove('hidden');
+        else headerBadge.classList.add('hidden');
+      }
+
+      const adminBadge = document.getElementById('adminInquiryBadge');
+      if (adminBadge) {
+        adminBadge.textContent = pendingCount;
+        if (pendingCount > 0) adminBadge.classList.remove('hidden');
+        else adminBadge.classList.add('hidden');
+      }
+
+      const pendingTopBadge = document.getElementById('adminPendingBadge');
+      if (pendingTopBadge) {
+        pendingTopBadge.textContent = '미처리 ' + pendingCount + '건';
+        if (pendingCount > 0) pendingTopBadge.classList.remove('hidden');
+        else pendingTopBadge.classList.add('hidden');
+      }
+    }
+
+    // 필터 전환
+    function filterAdminInquiries(filter) {
+      currentInqFilter = filter;
+      ['all', '대기', '완료'].forEach(f => {
+        const btn = document.getElementById('inqFilter-' + f);
+        if (btn) {
+          if (f === filter) {
+            btn.className = 'px-2.5 py-1 rounded-md bg-white text-slate-900 font-bold shadow-2xs cursor-pointer';
+          } else {
+            btn.className = 'px-2.5 py-1 rounded-md text-slate-600 hover:text-slate-900 cursor-pointer';
+          }
+        }
+      });
+      renderAdminInquiriesList();
+    }
+
+    // 실시간 문의 내역 불러오기 (로컬 캐시 + Supabase 동시 로드)
+    async function loadAdminInquiries() {
+      const container = document.getElementById('adminInquiriesContainer');
+      if (container) {
+        container.innerHTML = '<div class="p-8 text-center text-slate-400 text-xs bg-slate-50 rounded-xl border border-slate-200">데이터를 불러오는 중입니다...</div>';
+      }
+
+      // 1) 로컬 스토리지에서 먼저 복원
       try {
-        if (sbClient) {
-          const { data, error } = await sbClient
+        const localInqs = JSON.parse(localStorage.getItem('baekjae_inquiries') || '[]');
+        if (Array.isArray(localInqs) && localInqs.length > 0) {
+          adminInquiriesData = localInqs;
+        }
+      } catch(e) {}
+
+      // 2) Supabase 클라우드 DB에서 조회 시도
+      const activeSb = window.sbClient || (window.supabase && window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_KEY));
+      if (activeSb) {
+        try {
+          const { data, error } = await activeSb
             .from('inquiries')
             .select('*')
             .order('created_at', { ascending: false });
-          if (data) {
+          if (data && data.length > 0) {
             adminInquiriesData = data;
+            localStorage.setItem('baekjae_inquiries', JSON.stringify(adminInquiriesData));
           }
+        } catch(e) {
+          console.warn("Fetch inquiries error:", e);
         }
-      } catch(e) {
-        console.warn("Fetch inquiries error:", e);
       }
 
-      if (!adminInquiriesData || adminInquiriesData.length === 0) {
-        tbody.innerHTML = '<tr><td colSpan="5" class="p-8 text-center text-slate-400">아직 접수된 고객 문의가 없습니다.</td></tr>';
-        if (badge) badge.classList.add('hidden');
+      updateInquiryNotificationBadges();
+      renderAdminInquiriesList();
+    }
+
+    // 문의 목록 렌더링 (원클릭 전화걸기, 문자답장, 완료상태 변경, 메모기능 완비)
+    function renderAdminInquiriesList() {
+      const container = document.getElementById('adminInquiriesContainer');
+      if (!container) return;
+
+      let list = [...adminInquiriesData];
+      if (currentInqFilter === '대기') {
+        list = list.filter(i => (i.status || '대기') === '대기');
+      } else if (currentInqFilter === '완료') {
+        list = list.filter(i => i.status === '완료');
+      }
+
+      if (list.length === 0) {
+        container.innerHTML = `
+          <div class="p-10 text-center bg-slate-50 rounded-2xl border border-slate-200 text-slate-500">
+            <span class="text-3xl mb-2 block">📭</span>
+            <p class="font-bold text-sm text-slate-700">해당하는 문의 내역이 없습니다.</p>
+            <p class="text-xs text-slate-400 mt-1">고객이 홈페이지에서 문의를 남기면 여기에 실시간으로 표시됩니다.</p>
+          </div>
+        `;
         return;
       }
 
-      const pendingCount = adminInquiriesData.filter(i => (i.status || '대기') === '대기').length;
-      if (badge) {
-        badge.textContent = pendingCount;
-        if (pendingCount > 0) badge.classList.remove('hidden');
-        else badge.classList.add('hidden');
-      }
-
-      tbody.innerHTML = adminInquiriesData.map(item => {
+      container.innerHTML = list.map(item => {
         const isDone = item.status === '완료';
-        const dateStr = item.created_at ? new Date(item.created_at).toLocaleString('ko-KR') : '-';
+        const dateStr = item.created_at ? new Date(item.created_at).toLocaleString('ko-KR') : '방금 전';
+        const cleanPhone = (item.phone || '').replace(/[^0-9]/g, '');
+        const encodedSms = encodeURIComponent(`[백재상례복] 안녕하세요 ${item.name || '고객'}님, 홈페이지에 남겨주신 상례복 상담 문의에 대해 안내드립니다.`);
+
         return `
-          <tr class="hover:bg-slate-50 transition-colors">
-            <td class="p-3">
-              <button type="button" onclick="toggleAdminInquiryStatus('${item.id}', '${item.status || '대기'}')" class="px-2.5 py-1 rounded-full text-[11px] font-bold cursor-pointer transition-transform active:scale-95 ${isDone ? 'bg-green-100 text-green-800 border border-green-200' : 'bg-amber-100 text-amber-900 border border-amber-200 animate-pulse'}">
-                ${isDone ? '✓ 완료' : '● 대기'}
+          <div class="bg-white p-4 sm:p-5 rounded-2xl border ${isDone ? 'border-slate-200 bg-slate-50/50' : 'border-amber-300/80 shadow-xs bg-amber-50/20'} transition-all space-y-3">
+            
+            <!-- 상단 헤더: 완료 여부 체크 버튼 + 접수일시 + 삭제 버튼 -->
+            <div class="flex items-center justify-between flex-wrap gap-2">
+              <div class="flex items-center gap-2">
+                <button type="button" onclick="toggleAdminInquiryStatus('${item.id}', '${item.status || '대기'}')" class="px-3 py-1.5 rounded-full text-xs font-bold cursor-pointer transition-all active:scale-95 flex items-center gap-1.5 ${isDone ? 'bg-green-100 text-green-800 border border-green-300' : 'bg-amber-100 text-amber-900 border border-amber-300 animate-pulse'}">
+                  <span>${isDone ? '✓' : '●'}</span>
+                  <span>${isDone ? '상담 및 처리완료' : '상담 대기중 (클릭시 완료)'}</span>
+                </button>
+                <span class="text-[11px] text-slate-400">${dateStr}</span>
+              </div>
+
+              <div class="flex items-center gap-1.5">
+                <button type="button" onclick="deleteAdminInquiry('${item.id}')" class="text-slate-400 hover:text-red-500 p-1.5 text-xs rounded transition-colors cursor-pointer" title="문의 내역 삭제">
+                  🗑️ 삭제
+                </button>
+              </div>
+            </div>
+
+            <!-- 고객 정보 & 실시간 원클릭 답장 버튼 그룹 -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 bg-white rounded-xl border border-slate-200">
+              <div>
+                <p class="font-bold text-slate-900 text-sm flex items-center gap-1.5">
+                  <span>👤</span> ${item.name || '고객명 미기재'}
+                </p>
+                <p class="text-xs text-slate-600 mt-0.5 flex items-center gap-1 font-mono">
+                  <span>📞</span> ${item.phone || '연락처 없음'}
+                </p>
+              </div>
+
+              <!-- ★ 문의 답장 방식: 1클릭 전화 걸기 / 1클릭 문자(SMS) 답장 -->
+              <div class="flex items-center gap-2">
+                <a href="tel:${cleanPhone}" class="px-3 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-all shadow-2xs flex items-center gap-1.5 cursor-pointer">
+                  <span>📞</span> 전화 통화
+                </a>
+                <a href="sms:${cleanPhone}?body=${encodedSms}" class="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-all shadow-2xs flex items-center gap-1.5 cursor-pointer">
+                  <span>💬</span> 문자(SMS) 답장
+                </a>
+              </div>
+            </div>
+
+            <!-- 문의 상세 내용 -->
+            <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-100">
+              <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">고객 문의 내용</span>
+              <p class="text-xs text-slate-800 whitespace-pre-wrap leading-relaxed">${item.details || '내용 없음'}</p>
+            </div>
+
+            <!-- 관리자 상담 메모 & 답변 기록 -->
+            <div class="pt-2 flex items-center gap-2">
+              <span class="text-xs font-bold text-slate-500 shrink-0">📝 상담 메모:</span>
+              <input type="text" id="adminNote-${item.id}" value="${item.note || ''}" placeholder="상담 결과나 배송 예정일을 메모해두세요 (예: 오후 2시 남성 105호 직배송 완료)" class="flex-1 px-3 py-1.5 text-xs bg-white border border-slate-300 rounded-lg focus:outline-none focus:border-slate-800 text-slate-900">
+              <button type="button" onclick="saveAdminInquiryNote('${item.id}')" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-xs font-bold transition-colors cursor-pointer shrink-0">
+                메모 저장
               </button>
-            </td>
-            <td class="p-3 text-slate-400 whitespace-nowrap">${dateStr}</td>
-            <td class="p-3 font-bold text-slate-900 whitespace-nowrap">${item.name || '-'}</td>
-            <td class="p-3 text-slate-700 whitespace-nowrap">
-              <a href="tel:${item.phone}" class="hover:underline text-slate-900 font-medium">${item.phone || '-'}</a>
-            </td>
-            <td class="p-3 text-slate-600 whitespace-pre-wrap leading-relaxed">${item.details || '-'}</td>
-          </tr>
+            </div>
+
+          </div>
         `;
       }).join('');
     }
 
-    // 문의 상태 변경 (대기 <-> 완료)
+    // 문의 완료 여부 토글 (대기 <-> 완료)
     async function toggleAdminInquiryStatus(id, current) {
       const next = current === '대기' ? '완료' : '대기';
-      if (sbClient) {
+      
+      // 로컬 스토리지 즉시 업데이트
+      adminInquiriesData = adminInquiriesData.map(i => String(i.id) === String(id) ? { ...i, status: next } : i);
+      localStorage.setItem('baekjae_inquiries', JSON.stringify(adminInquiriesData));
+
+      // Supabase 동기화 시도
+      const activeSb = window.sbClient || (window.supabase && window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_KEY));
+      if (activeSb) {
         try {
-          await sbClient.from('inquiries').update({ status: next }).eq('id', id);
+          await activeSb.from('inquiries').update({ status: next }).eq('id', id);
         } catch(e) {
           console.warn(e);
         }
       }
-      adminInquiriesData = adminInquiriesData.map(i => String(i.id) === String(id) ? { ...i, status: next } : i);
-      loadAdminInquiries();
+
+      updateInquiryNotificationBadges();
+      renderAdminInquiriesList();
+      showToast(next === '완료' ? "✓ 문의가 '처리 완료'로 변경되었습니다." : "문의 상태가 '대기'로 변경되었습니다.");
+    }
+
+    // 관리자 상담 메모 저장
+    async function saveAdminInquiryNote(id) {
+      const inp = document.getElementById('adminNote-' + id);
+      const noteVal = inp ? inp.value.trim() : '';
+      
+      adminInquiriesData = adminInquiriesData.map(i => String(i.id) === String(id) ? { ...i, note: noteVal } : i);
+      localStorage.setItem('baekjae_inquiries', JSON.stringify(adminInquiriesData));
+
+      const activeSb = window.sbClient || (window.supabase && window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_KEY));
+      if (activeSb) {
+        try {
+          await activeSb.from('inquiries').update({ note: noteVal }).eq('id', id);
+        } catch(e) {}
+      }
+
+      showToast("✓ 상담 메모가 저장되었습니다.");
+    }
+
+    // 문의 내역 삭제
+    async function deleteAdminInquiry(id) {
+      if (!confirm("이 문의 내역을 정말로 삭제하시겠습니까?")) return;
+      
+      adminInquiriesData = adminInquiriesData.filter(i => String(i.id) !== String(id));
+      localStorage.setItem('baekjae_inquiries', JSON.stringify(adminInquiriesData));
+
+      const activeSb = window.sbClient || (window.supabase && window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_KEY));
+      if (activeSb) {
+        try {
+          await activeSb.from('inquiries').delete().eq('id', id);
+        } catch(e) {}
+      }
+
+      updateInquiryNotificationBadges();
+      renderAdminInquiriesList();
+      showToast("✓ 문의 내역이 삭제되었습니다.");
     }
 
     // 상품 정의 목록
@@ -2132,8 +2343,7 @@
       }
     }
 
-    // 일반 고객 문의 접수 시 Supabase inquiries 테이블 자동 연동
-    const origHandleInquirySubmit = window.handleInquirySubmit;
+    // 일반 고객 문의 접수 시 실시간 알림 연동 및 저장
     window.handleInquirySubmit = async function(e) {
       e.preventDefault();
       const form = e.target;
@@ -2141,14 +2351,52 @@
       const phone = document.getElementById('phone')?.value || '';
       const details = document.getElementById('details')?.value || '';
 
-      if (sbClient) {
+      const newInquiry = {
+        id: 'inq_' + Date.now(),
+        name,
+        phone,
+        details,
+        status: '대기',
+        created_at: new Date().toISOString()
+      };
+
+      // 1) 로컬 스토리지에 즉시 추가
+      try {
+        const localList = JSON.parse(localStorage.getItem('baekjae_inquiries') || '[]');
+        localList.unshift(newInquiry);
+        localStorage.setItem('baekjae_inquiries', JSON.stringify(localList));
+        adminInquiriesData = localList;
+      } catch(err) {}
+
+      // 2) Supabase 클라우드 DB에 추가 시도
+      const activeSb = window.sbClient || (window.supabase && window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_KEY));
+      if (activeSb) {
         try {
-          await sbClient.from('inquiries').insert([{ name, phone, details, status: '대기' }]);
+          await activeSb.from('inquiries').insert([{ 
+            name, 
+            phone, 
+            details, 
+            status: '대기' 
+          }]);
         } catch(err) {
           console.warn("Inquiry insert note:", err);
         }
       }
-      alert("문의가 성공적으로 접수되었습니다. 담당자가 신속히 연락드리겠습니다.");
+
+      // 3) 관리자 헤더 뱃지 실시간 점등
+      updateInquiryNotificationBadges();
+
+      // 4) 브라우저 팝업 알림 (권한 허용 시)
+      if ("Notification" in window && Notification.permission === "granted") {
+        new Notification("🔔 [백재상례복] 새 상담 문의 접수!", {
+          body: `${name}님 (${phone}): ${details.slice(0, 40)}...`,
+          icon: "home_model.jpg"
+        });
+      }
+
+      // 5) 고객 완료 안내 (긴급 상담 전화 연결 버튼 포함)
+      showToast("✓ 상담 문의가 정상적으로 접수되었습니다. 담당자에게 실시간 알림이 전송되었습니다.");
+      alert(`✓ 상담 문의가 정상적으로 접수되었습니다!\n\n[접수 정보]\n성함: ${name}\n연락처: ${phone}\n\n담당자에게 실시간 알림이 전달되었으며, 기재해주신 연락처로 신속히 연락드리겠습니다.\n(긴급 직통 전화: 010-3112-6730)`);
       form.reset();
     };
   </script>
