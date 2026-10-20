@@ -168,7 +168,7 @@ const HomePage: React.FC<HomePageProps> = ({ setActiveTab }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // 기본 세로형 쇼츠 샘플 비디오 URL
-  const sampleVideoUrl = "https://assets.mixkit.co/videos/preview/mixkit-hands-of-a-man-wearing-a-suit-adjusting-his-cufflinks-43180-large.mp4";
+  const sampleVideoUrl = "baekjae_shorts.mp4";
 
   // 페이지 마운트 시 영구 저장된 쇼츠 불러오기
   useEffect(() => {
@@ -695,8 +695,20 @@ interface ProductsPageProps {
 }
 
 const ProductsPage: React.FC<ProductsPageProps> = ({ setActiveTab }) => {
+  const DEFAULT_PRODUCT_IMAGES: Record<string, string> = {
+    'm1': 'images/product_m1.jpg',
+    'm2': 'images/product_m2.jpg',
+    'w1': 'images/product_w1.jpg',
+    'am1': 'images/product_am1.jpg',
+    'am2': 'images/product_am2.jpg',
+  };
+
   const [productImages, setProductImages] = useState<Record<string, string>>({
-    'm1': HOME_MODEL_IMAGE,
+    'm1': 'images/product_m1.jpg',
+    'm2': 'images/product_m2.jpg',
+    'w1': 'images/product_w1.jpg',
+    'am1': 'images/product_am1.jpg',
+    'am2': 'images/product_am2.jpg',
   });
 
   const [dragOverId, setDragOverId] = useState<string | null>(null);

@@ -168,7 +168,7 @@
 
             <!-- 쇼츠 플레이어 컨테이너 -->
             <div class="relative w-full max-w-[310px] mx-auto aspect-[9/16] bg-slate-950 rounded-2xl overflow-hidden shadow-2xl border-4 border-slate-800 flex items-center justify-center group" id="playerContainer">
-              <video id="shortsVideo" src="https://assets.mixkit.co/videos/preview/mixkit-hands-of-a-man-wearing-a-suit-adjusting-his-cufflinks-43180-large.mp4" class="w-full h-full object-cover" autoplay loop muted playsinline></video>
+              <video id="shortsVideo" src="baekjae_shorts.mp4" class="w-full h-full object-cover" autoplay loop muted playsinline></video>
               <iframe id="youtubeIframe" class="w-full h-full border-0 hidden" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
               <div id="videoOverlay" class="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/80 pointer-events-none"></div>
 
@@ -199,7 +199,7 @@
                   <span class="w-5 h-5 rounded-full bg-slate-800 border border-slate-600 flex items-center justify-center text-[10px] font-bold">백</span>
                   <span class="text-xs font-semibold drop-shadow">@백재상례복</span>
                 </div>
-                <p id="captionText" class="text-xs text-slate-100 font-light drop-shadow leading-snug line-clamp-2">상례복 바르게 입는 법 & 완장 착용 예절 가이드</p>
+                <p id="captionText" class="text-xs text-slate-100 font-light drop-shadow leading-snug line-clamp-2">백재상례복 정통 의전 및 착용 안내</p>
                 <p class="text-[10px] text-slate-300 mt-1 font-medium">#백재상례복 #장례예절 #상례복안내</p>
               </div>
             </div>
@@ -283,11 +283,11 @@
             <div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-200 group hover:shadow-md transition-all flex flex-col justify-between">
               <div id="drop-box-m1" class="w-full aspect-[3/4] bg-slate-100 flex items-center justify-center relative overflow-hidden cursor-pointer group" ondragover="handleProductDragOver(event, 'm1')" ondragleave="handleProductDragLeave(event, 'm1')" ondrop="handleProductDrop(event, 'm1')" onclick="triggerProductFileInput('m1')">
                 <input type="file" id="file-input-m1" accept="image/*" class="hidden" onchange="handleProductFileSelect(event, 'm1')">
-                <img id="img-m1" src="home_model.jpg" alt="상·하의 양복" class="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1594938298603-c8148c4dae35?auto=format&fit=crop&w=800&q=80';">
+                <img id="img-m1" src="images/product_m1.jpg" alt="상·하의 양복" class="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500" onerror="this.onerror=null; this.src='home_model.jpg';">
                 <div class="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-medium pointer-events-none">
                   <span class="bg-slate-900/90 px-3 py-1.5 rounded-full shadow-md">📷 사진 끌어다놓기 / 변경</span>
                 </div>
-                <button type="button" id="reset-btn-m1" onclick="resetSingleProductImage(event, 'm1')" class="hidden absolute top-2 right-2 bg-slate-900/80 hover:bg-red-600 text-white text-[11px] px-2 py-1 rounded-md transition-colors shadow z-10">사진 초기화</button>
+                <button type="button" id="reset-btn-m1" onclick="resetSingleProductImage(event, 'm1')" class="absolute top-2 right-2 bg-slate-900/80 hover:bg-red-600 text-white text-[11px] px-2 py-1 rounded-md transition-colors shadow z-10">사진 초기화</button>
               </div>
               <div class="p-5 flex flex-col justify-between flex-grow">
                 <div>
@@ -310,11 +310,15 @@
             <div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-200 group hover:shadow-md transition-all flex flex-col justify-between">
               <div id="drop-box-m2" class="w-full aspect-[3/4] bg-slate-100 flex items-center justify-center relative overflow-hidden cursor-pointer group" ondragover="handleProductDragOver(event, 'm2')" ondragleave="handleProductDragLeave(event, 'm2')" ondrop="handleProductDrop(event, 'm2')" onclick="triggerProductFileInput('m2')">
                 <input type="file" id="file-input-m2" accept="image/*" class="hidden" onchange="handleProductFileSelect(event, 'm2')">
-                <div id="placeholder-m2" class="flex flex-col items-center justify-center text-slate-400 p-6 text-center">
+                <img id="img-m2" src="images/product_m2.jpg" alt="와이셔츠" class="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500">
+                <div id="placeholder-m2" class="hidden flex flex-col items-center justify-center text-slate-400 p-6 text-center">
                   <div class="w-14 h-14 rounded-2xl bg-white border border-slate-200 shadow-xs flex items-center justify-center mb-3 text-2xl group-hover:scale-110 transition-transform">👔</div>
                   <span class="text-sm font-semibold text-slate-700">사진 드래그 또는 클릭</span>
                 </div>
-                <button type="button" id="reset-btn-m2" onclick="resetSingleProductImage(event, 'm2')" class="hidden absolute top-2 right-2 bg-slate-900/80 hover:bg-red-600 text-white text-[11px] px-2 py-1 rounded-md transition-colors shadow z-10">사진 초기화</button>
+                <div class="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-medium pointer-events-none">
+                  <span class="bg-slate-900/90 px-3 py-1.5 rounded-full shadow-md">📷 사진 끌어다놓기 / 변경</span>
+                </div>
+                <button type="button" id="reset-btn-m2" onclick="resetSingleProductImage(event, 'm2')" class="absolute top-2 right-2 bg-slate-900/80 hover:bg-red-600 text-white text-[11px] px-2 py-1 rounded-md transition-colors shadow z-10">사진 초기화</button>
               </div>
               <div class="p-5 flex flex-col justify-between flex-grow">
                 <div>
@@ -347,11 +351,15 @@
             <div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-200 group hover:shadow-md transition-all flex flex-col justify-between">
               <div id="drop-box-w1" class="w-full aspect-[3/4] bg-slate-100 flex items-center justify-center relative overflow-hidden cursor-pointer group" ondragover="handleProductDragOver(event, 'w1')" ondragleave="handleProductDragLeave(event, 'w1')" ondrop="handleProductDrop(event, 'w1')" onclick="triggerProductFileInput('w1')">
                 <input type="file" id="file-input-w1" accept="image/*" class="hidden" onchange="handleProductFileSelect(event, 'w1')">
-                <div id="placeholder-w1" class="flex flex-col items-center justify-center text-slate-400 p-6 text-center">
+                <img id="img-w1" src="images/product_w1.jpg" alt="개량 한복" class="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500">
+                <div id="placeholder-w1" class="hidden flex flex-col items-center justify-center text-slate-400 p-6 text-center">
                   <div class="w-14 h-14 rounded-2xl bg-white border border-slate-200 shadow-xs flex items-center justify-center mb-3 text-2xl group-hover:scale-110 transition-transform">👘</div>
                   <span class="text-sm font-semibold text-slate-700">사진 드래그 또는 클릭</span>
                 </div>
-                <button type="button" id="reset-btn-w1" onclick="resetSingleProductImage(event, 'w1')" class="hidden absolute top-2 right-2 bg-slate-900/80 hover:bg-red-600 text-white text-[11px] px-2 py-1 rounded-md transition-colors shadow z-10">사진 초기화</button>
+                <div class="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-medium pointer-events-none">
+                  <span class="bg-slate-900/90 px-3 py-1.5 rounded-full shadow-md">📷 사진 끌어다놓기 / 변경</span>
+                </div>
+                <button type="button" id="reset-btn-w1" onclick="resetSingleProductImage(event, 'w1')" class="absolute top-2 right-2 bg-slate-900/80 hover:bg-red-600 text-white text-[11px] px-2 py-1 rounded-md transition-colors shadow z-10">사진 초기화</button>
               </div>
               <div class="p-5 flex flex-col justify-between flex-grow">
                 <div>
@@ -384,11 +392,15 @@
             <div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-200 group hover:shadow-md transition-all flex flex-col justify-between">
               <div id="drop-box-am1" class="w-full aspect-[3/4] bg-slate-100 flex items-center justify-center relative overflow-hidden cursor-pointer group" ondragover="handleProductDragOver(event, 'am1')" ondragleave="handleProductDragLeave(event, 'am1')" ondrop="handleProductDrop(event, 'am1')" onclick="triggerProductFileInput('am1')">
                 <input type="file" id="file-input-am1" accept="image/*" class="hidden" onchange="handleProductFileSelect(event, 'am1')">
-                <div id="placeholder-am1" class="flex flex-col items-center justify-center text-slate-400 p-6 text-center">
+                <img id="img-am1" src="images/product_am1.jpg" alt="완장" class="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500">
+                <div id="placeholder-am1" class="hidden flex flex-col items-center justify-center text-slate-400 p-6 text-center">
                   <span class="text-4xl mb-2">🎗️</span>
                   <span class="text-xs font-semibold text-slate-700">사진 드래그 또는 클릭</span>
                 </div>
-                <button type="button" id="reset-btn-am1" onclick="resetSingleProductImage(event, 'am1')" class="hidden absolute top-2 right-2 bg-slate-900/80 hover:bg-red-600 text-white text-[11px] px-2 py-1 rounded-md transition-colors shadow z-10">사진 초기화</button>
+                <div class="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-medium pointer-events-none">
+                  <span class="bg-slate-900/90 px-3 py-1.5 rounded-full shadow-md">📷 사진 끌어다놓기 / 변경</span>
+                </div>
+                <button type="button" id="reset-btn-am1" onclick="resetSingleProductImage(event, 'am1')" class="absolute top-2 right-2 bg-slate-900/80 hover:bg-red-600 text-white text-[11px] px-2 py-1 rounded-md transition-colors shadow z-10">사진 초기화</button>
               </div>
               <div class="p-5 flex flex-col justify-between flex-grow">
                 <div>
@@ -411,11 +423,15 @@
             <div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-200 group hover:shadow-md transition-all flex flex-col justify-between">
               <div id="drop-box-am2" class="w-full aspect-[3/4] bg-slate-100 flex items-center justify-center relative overflow-hidden cursor-pointer group" ondragover="handleProductDragOver(event, 'am2')" ondragleave="handleProductDragLeave(event, 'am2')" ondrop="handleProductDrop(event, 'am2')" onclick="triggerProductFileInput('am2')">
                 <input type="file" id="file-input-am2" accept="image/*" class="hidden" onchange="handleProductFileSelect(event, 'am2')">
-                <div id="placeholder-am2" class="flex flex-col items-center justify-center text-slate-400 p-6 text-center">
+                <img id="img-am2" src="images/product_am2.jpg" alt="넥타이" class="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500">
+                <div id="placeholder-am2" class="hidden flex flex-col items-center justify-center text-slate-400 p-6 text-center">
                   <span class="text-4xl mb-2">👔</span>
                   <span class="text-xs font-semibold text-slate-700">사진 드래그 또는 클릭</span>
                 </div>
-                <button type="button" id="reset-btn-am2" onclick="resetSingleProductImage(event, 'am2')" class="hidden absolute top-2 right-2 bg-slate-900/80 hover:bg-red-600 text-white text-[11px] px-2 py-1 rounded-md transition-colors shadow z-10">사진 초기화</button>
+                <div class="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-medium pointer-events-none">
+                  <span class="bg-slate-900/90 px-3 py-1.5 rounded-full shadow-md">📷 사진 끌어다놓기 / 변경</span>
+                </div>
+                <button type="button" id="reset-btn-am2" onclick="resetSingleProductImage(event, 'am2')" class="absolute top-2 right-2 bg-slate-900/80 hover:bg-red-600 text-white text-[11px] px-2 py-1 rounded-md transition-colors shadow z-10">사진 초기화</button>
               </div>
               <div class="p-5 flex flex-col justify-between flex-grow">
                 <div>
@@ -766,6 +782,14 @@
 
     // --- 4. 상품 사진 & 가격 상태 관리 ---
     let savedProductImages = {};
+    const defaultProductImages = {
+      m1: 'images/product_m1.jpg',
+      m2: 'images/product_m2.jpg',
+      w1: 'images/product_w1.jpg',
+      am1: 'images/product_am1.jpg',
+      am2: 'images/product_am2.jpg'
+    };
+
     let savedPrices = {};
 
     window.addEventListener('DOMContentLoaded', async () => {
@@ -936,14 +960,19 @@
       const img = document.getElementById('img-' + id);
       const resetBtn = document.getElementById('reset-btn-' + id);
 
-      if (id === 'm1') {
-        if (img) img.src = 'home_model.jpg';
+      const defaultImg = defaultProductImages[id];
+      if (defaultImg) {
+        if (img) {
+          img.src = defaultImg;
+          img.classList.remove('hidden');
+        }
+        if (placeholder) placeholder.classList.add('hidden');
       } else {
         if (img) img.classList.add('hidden');
         if (placeholder) placeholder.classList.remove('hidden');
         if (resetBtn) resetBtn.classList.add('hidden');
       }
-      showToast("해당 사진이 초기화되었습니다.");
+      showToast("해당 사진이 기본 상태로 복원되었습니다.");
     }
 
     // 모든 상품 사진 일괄 초기화
@@ -978,7 +1007,7 @@
     }
 
     // --- 8. 쇼츠 인터랙션 및 영구 저장 스크립트 ---
-    const sampleVideo = "https://assets.mixkit.co/videos/preview/mixkit-hands-of-a-man-wearing-a-suit-adjusting-his-cufflinks-43180-large.mp4";
+    const sampleVideo = "baekjae_shorts.mp4";
     const video = document.getElementById('shortsVideo');
     const iframe = document.getElementById('youtubeIframe');
     const playBtn = document.getElementById('playBtn');
