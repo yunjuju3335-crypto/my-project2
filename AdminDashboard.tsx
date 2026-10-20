@@ -88,11 +88,25 @@ export default function AdminDashboard({ onExit }: AdminDashboardProps) {
   // 수정한 가격을 DB에 일괄 저장
   const saveAllPrices = async () => {
     try {
+      let rlsBlocked = false;
+      let lastErrMsg = '';
       for (const product of products) {
-        await supabase.from('products').upsert({ id: product.id, name: product.name, price: product.price });
+        const { error } = await supabase.from('products').upsert({ id: product.id, name: product.name, price: product.price });
+        if (error) {
+          lastErrMsg = error.message;
+          if (error.code === '42501' || error.message.includes('row-level security')) {
+            rlsBlocked = true;
+          }
+        }
       }
-      alert('모든 가격 정보가 성공적으로 Supabase에 업데이트되었습니다.');
-      fetchProducts();
+      if (rlsBlocked) {
+        alert("⚠️ [안내] Supabase 클라우드 저장 실패 (RLS 보안 정책 차단)\n\nSupabase의 RLS(행 수준 보안)로 인해 클라우드 DB 저장이 차단되었습니다.\n\n[해결 방법]\nSupabase 대시보드 -> SQL Editor에서 아래 명령어를 실행해주세요:\nALTER TABLE products DISABLE ROW LEVEL SECURITY;");
+      } else if (lastErrMsg) {
+        alert("⚠️ 저장 오류: " + lastErrMsg);
+      } else {
+        alert('모든 가격 정보가 성공적으로 Supabase에 업데이트되었습니다.');
+        fetchProducts();
+      }
     } catch (err: any) {
       alert('저장 중 오류 발생: ' + err.message);
     }
