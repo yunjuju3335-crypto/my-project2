@@ -702,34 +702,141 @@
     </section>
 
     <!-- 4. 자주묻는질문 화면 -->
-    <section id="page-faq" class="page-content animate-fade-in hidden pb-12">
-      <div class="max-w-3xl mx-auto">
-        <div class="mb-10 border-b border-slate-200 pb-6 text-center">
-          <h2 class="text-3xl font-serif font-bold text-slate-800 mb-2">자주 묻는 질문</h2>
-          <p class="text-slate-500">고객님들께서 자주 문의하시는 내용을 모았습니다.</p>
-        </div>
-        <div class="space-y-4">
-          <div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
-            <button type="button" onclick="toggleFaq(1)" class="w-full flex justify-between items-center px-6 py-5 text-left focus:outline-none hover:bg-slate-50 cursor-pointer">
-              <span class="font-medium text-slate-800 flex items-center"><span class="text-slate-400 mr-3 font-bold">Q.</span>주문 후 배송까지 얼마나 걸리나요?</span>
-              <span id="faq-icon-1" class="text-slate-400 text-lg">▼</span>
-            </button>
-            <div id="faq-ans-1" class="px-6 py-5 bg-slate-50 border-t border-slate-100 text-slate-600 leading-relaxed block">
-              <span class="text-slate-400 mr-3 font-bold float-left">A.</span>
-              <p class="ml-7">최대한 빠르고 안전하게 당일 또는 익일 배송을 원칙으로 하고 있습니다. 급하신 경우 백재상례복으로 연락 주시면 맞춤 배송을 안내해 드립니다.</p>
+    <section id="page-faq" class="page-content animate-fade-in hidden pb-16">
+      <div class="max-w-4xl mx-auto">
+        <!-- 상단 헤더 -->
+        <div class="mb-8 text-center">
+          <span class="text-xs font-bold tracking-widest text-amber-700 bg-amber-50 border border-amber-200/60 px-3 py-1 rounded-full uppercase inline-block mb-3">FAQ & 안내</span>
+          <h2 class="text-3xl sm:text-4xl font-serif font-bold text-slate-900 mb-3">자주 묻는 질문</h2>
+          <p class="text-slate-500 text-sm sm:text-base max-w-xl mx-auto">고객님들께서 자주 문의하시는 궁금증을 모았습니다. 신속하고 명확하게 답변해 드립니다.</p>
+
+          <!-- 관리자 전용 바로가기 바 (관리자 로그인 시 노출) -->
+          <div id="userFaqAdminBar" class="hidden mt-4 p-3 bg-slate-900 text-white rounded-2xl shadow-sm max-w-lg mx-auto flex items-center justify-between gap-3 text-xs">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span class="font-medium text-slate-200">관리자 접속 중: 질문/답변 관리 가능</span>
             </div>
-          </div>
-          <div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
-            <button type="button" onclick="toggleFaq(2)" class="w-full flex justify-between items-center px-6 py-5 text-left focus:outline-none hover:bg-slate-50 cursor-pointer">
-              <span class="font-medium text-slate-800 flex items-center"><span class="text-slate-400 mr-3 font-bold">Q.</span>사이즈 교환이나 환불이 가능한가요?</span>
-              <span id="faq-icon-2" class="text-slate-400 text-lg">▼</span>
+            <button type="button" onclick="openAdminModal(); switchAdminTab('faq');" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-3 py-1.5 rounded-xl transition-colors cursor-pointer shrink-0">
+              ⚙️ FAQ 관리 대시보드 ↗
             </button>
-            <div id="faq-ans-2" class="px-6 py-5 bg-slate-50 border-t border-slate-100 text-slate-600 leading-relaxed hidden">
-              <span class="text-slate-400 mr-3 font-bold float-left">A.</span>
-              <p class="ml-7">발인 전 미착용 상품에 한하여 백재상례복으로 접수 시 교환 및 환불이 가능합니다. 단, 상품을 한 번이라도 착용하신 흔적이 발견되면 교환이 불가합니다.</p>
-            </div>
           </div>
         </div>
+
+        <!-- 검색 및 카테고리 필터 바 -->
+        <div class="mb-8 space-y-4">
+          <!-- 실시간 검색 인풋 -->
+          <div class="relative max-w-xl mx-auto">
+            <input type="text" id="userFaqSearchInput" oninput="handleUserFaqSearch(this.value)" placeholder="궁금하신 내용을 검색해보세요 (예: 배송, 교환, 사이즈, 대량주문...)" class="w-full pl-11 pr-10 py-3.5 bg-white border border-slate-200 rounded-2xl shadow-2xs text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-transparent transition-all" />
+            <span class="absolute left-4 top-3.5 text-slate-400 text-base">🔍</span>
+            <button type="button" id="userFaqSearchClear" onclick="clearUserFaqSearch()" class="hidden absolute right-3.5 top-3 text-slate-400 hover:text-slate-600 text-sm p-1 cursor-pointer">✕</button>
+          </div>
+
+          <!-- 카테고리 필터 탭 -->
+          <div class="flex flex-wrap items-center justify-center gap-1.5 pt-1" id="userFaqCategoryPills">
+            <button type="button" onclick="filterUserFaqCategory('all')" data-cat="all" class="faq-cat-pill px-4 py-2 rounded-xl text-xs font-bold transition-all bg-slate-900 text-white shadow-2xs cursor-pointer">전체보기</button>
+            <button type="button" onclick="filterUserFaqCategory('주문/배송')" data-cat="주문/배송" class="faq-cat-pill px-4 py-2 rounded-xl text-xs font-medium transition-all bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 cursor-pointer">주문/배송</button>
+            <button type="button" onclick="filterUserFaqCategory('교환/환불')" data-cat="교환/환불" class="faq-cat-pill px-4 py-2 rounded-xl text-xs font-medium transition-all bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 cursor-pointer">교환/환불</button>
+            <button type="button" onclick="filterUserFaqCategory('상품/사이즈')" data-cat="상품/사이즈" class="faq-cat-pill px-4 py-2 rounded-xl text-xs font-medium transition-all bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 cursor-pointer">상품/사이즈</button>
+            <button type="button" onclick="filterUserFaqCategory('대량주문')" data-cat="대량주문" class="faq-cat-pill px-4 py-2 rounded-xl text-xs font-medium transition-all bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 cursor-pointer">대량주문</button>
+            <button type="button" onclick="filterUserFaqCategory('일반문의')" data-cat="일반문의" class="faq-cat-pill px-4 py-2 rounded-xl text-xs font-medium transition-all bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 cursor-pointer">기타문의</button>
+          </div>
+        </div>
+
+        <!-- FAQ 아코디언 컨테이너 (실시간 렌더링 + 초기 프리렌더링) -->
+        <div id="userFaqContainer" class="space-y-3.5">
+          <div class="faq-item bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-2xs transition-all hover:border-slate-300" data-faq-id="faq_1" data-category="주문/배송">
+            <button type="button" onclick="toggleFaqItem('faq_1')" class="w-full flex items-center justify-between px-6 py-5 text-left focus:outline-none cursor-pointer select-none">
+              <div class="flex items-center gap-3.5 flex-1 pr-3">
+                <span class="text-xs font-bold px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 border border-blue-200 shrink-0">주문/배송</span>
+                <span class="font-bold text-slate-800 text-sm sm:text-base flex items-center">
+                  <span class="text-amber-600 mr-2.5 font-serif font-black text-lg">Q.</span>
+                  <span>주문 후 배송까지 얼마나 걸리나요?</span>
+                </span>
+              </div>
+              <span id="faq-chevron-faq_1" class="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-xs transition-colors shrink-0">▲</span>
+            </button>
+            <div id="faq-body-faq_1" class="px-6 py-5 bg-slate-50/70 border-t border-slate-100 text-slate-700 leading-relaxed text-sm block">
+              <div class="flex items-start gap-3">
+                <span class="text-slate-400 font-serif font-black text-lg shrink-0 mt-[-2px]">A.</span>
+                <div class="flex-1 whitespace-pre-line leading-relaxed">최대한 빠르고 안전하게 당일 또는 익일 배송을 원칙으로 하고 있습니다. 급하신 경우 백재상례복(010-3112-6730)으로 연락 주시면 맞춤 배송을 신속히 안내해 드립니다.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="faq-item bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-2xs transition-all hover:border-slate-300" data-faq-id="faq_2" data-category="교환/환불">
+            <button type="button" onclick="toggleFaqItem('faq_2')" class="w-full flex items-center justify-between px-6 py-5 text-left focus:outline-none cursor-pointer select-none">
+              <div class="flex items-center gap-3.5 flex-1 pr-3">
+                <span class="text-xs font-bold px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 shrink-0">교환/환불</span>
+                <span class="font-bold text-slate-800 text-sm sm:text-base flex items-center">
+                  <span class="text-amber-600 mr-2.5 font-serif font-black text-lg">Q.</span>
+                  <span>사이즈 교환이나 환불이 가능한가요?</span>
+                </span>
+              </div>
+              <span id="faq-chevron-faq_2" class="w-8 h-8 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center font-bold text-xs transition-colors shrink-0">▼</span>
+            </button>
+            <div id="faq-body-faq_2" class="hidden px-6 py-5 bg-slate-50/70 border-t border-slate-100 text-slate-700 leading-relaxed text-sm">
+              <div class="flex items-start gap-3">
+                <span class="text-slate-400 font-serif font-black text-lg shrink-0 mt-[-2px]">A.</span>
+                <div class="flex-1 whitespace-pre-line leading-relaxed">발인 전 미착용 상품에 한하여 백재상례복으로 접수 시 교환 및 환불이 가능합니다. 단, 상품을 한 번이라도 착용하신 흔적이 발견되면 교환이 불가합니다.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="faq-item bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-2xs transition-all hover:border-slate-300" data-faq-id="faq_3" data-category="대량주문">
+            <button type="button" onclick="toggleFaqItem('faq_3')" class="w-full flex items-center justify-between px-6 py-5 text-left focus:outline-none cursor-pointer select-none">
+              <div class="flex items-center gap-3.5 flex-1 pr-3">
+                <span class="text-xs font-bold px-2.5 py-1 rounded-lg bg-purple-50 text-purple-700 border border-purple-200 shrink-0">대량주문</span>
+                <span class="font-bold text-slate-800 text-sm sm:text-base flex items-center">
+                  <span class="text-amber-600 mr-2.5 font-serif font-black text-lg">Q.</span>
+                  <span>장례식장 납품이나 대량 주문 계약도 가능한가요?</span>
+                </span>
+              </div>
+              <span id="faq-chevron-faq_3" class="w-8 h-8 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center font-bold text-xs transition-colors shrink-0">▼</span>
+            </button>
+            <div id="faq-body-faq_3" class="hidden px-6 py-5 bg-slate-50/70 border-t border-slate-100 text-slate-700 leading-relaxed text-sm">
+              <div class="flex items-start gap-3">
+                <span class="text-slate-400 font-serif font-black text-lg shrink-0 mt-[-2px]">A.</span>
+                <div class="flex-1 whitespace-pre-line leading-relaxed">네, 전국 병원 및 전문 장례식장 전용 정기 납품 계약과 대량 주문을 상시 지원하고 있습니다. 고객센터(010-3112-6730) 또는 1:1 상담 문의로 연락 주시면 전용 특별 단가표와 맞춤 혜택을 신속히 안내해 드립니다.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="faq-item bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-2xs transition-all hover:border-slate-300" data-faq-id="faq_4" data-category="상품/사이즈">
+            <button type="button" onclick="toggleFaqItem('faq_4')" class="w-full flex items-center justify-between px-6 py-5 text-left focus:outline-none cursor-pointer select-none">
+              <div class="flex items-center gap-3.5 flex-1 pr-3">
+                <span class="text-xs font-bold px-2.5 py-1 rounded-lg bg-amber-50 text-amber-800 border border-amber-200 shrink-0">상품/사이즈</span>
+                <span class="font-bold text-slate-800 text-sm sm:text-base flex items-center">
+                  <span class="text-amber-600 mr-2.5 font-serif font-black text-lg">Q.</span>
+                  <span>체형별 추천 사이즈 및 남녀 복식 구성은 어떻게 되나요?</span>
+                </span>
+              </div>
+              <span id="faq-chevron-faq_4" class="w-8 h-8 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center font-bold text-xs transition-colors shrink-0">▼</span>
+            </button>
+            <div id="faq-body-faq_4" class="hidden px-6 py-5 bg-slate-50/70 border-t border-slate-100 text-slate-700 leading-relaxed text-sm">
+              <div class="flex items-start gap-3">
+                <span class="text-slate-400 font-serif font-black text-lg shrink-0 mt-[-2px]">A.</span>
+                <div class="flex-1 whitespace-pre-line leading-relaxed">백재상례복의 남성 상·하의 양복과 여성 개량한복은 표준 예식 규격에 맞춰 편안하고 품격 있는 핏으로 엄선 제작됩니다. 키와 체형에 맞춘 상세 치수 선택이 고민되실 경우 키와 평소 옷 사이즈를 알려주시면 가장 알맞은 호수로 준비해 드립니다.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 하단 상담 바로가기 배너 -->
+        <div class="mt-12 bg-gradient-to-r from-slate-900 to-slate-800 rounded-3xl p-6 sm:p-8 text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-6">
+          <div class="space-y-1 text-center md:text-left">
+            <h4 class="font-serif font-bold text-lg sm:text-xl text-white">원하시는 답변을 찾지 못하셨나요?</h4>
+            <p class="text-xs sm:text-sm text-slate-300">24시간 언제든 편안하게 1:1 상담 문의를 남겨주시거나 직통 전화로 연락주세요.</p>
+          </div>
+          <div class="flex flex-wrap items-center justify-center gap-3 shrink-0">
+            <button type="button" onclick="switchTab('inquiry')" class="px-5 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-xl shadow-md transition-colors cursor-pointer flex items-center gap-1.5">
+              <span>✍️</span> 1:1 상담 문의 접수
+            </button>
+            <a href="tel:010-3112-6730" class="px-5 py-2.5 bg-white/10 hover:bg-white/20 text-white font-bold text-xs rounded-xl border border-white/20 transition-colors flex items-center gap-1.5">
+              <span>📞</span> 010-3112-6730 직통
+            </a>
+          </div>
+        </div>
+
       </div>
     </section>
 
@@ -1011,6 +1118,7 @@
         adminAuthed = true;
       }
       updateAdminUI();
+      initFaqs();
       // 회원 로그인 세션 복원
       try {
         const sessionUser = JSON.parse(sessionStorage.getItem('baekjae_current_user') || 'null');
@@ -1503,6 +1611,10 @@
             <button type="button" onclick="switchAdminTab('products')" id="adminTabBtn-products" class="w-full text-left px-3.5 py-2.5 rounded-xl font-medium text-xs transition-colors text-slate-600 hover:bg-slate-200/70 cursor-pointer">
               🛍️ 상품 및 가격
             </button>
+            <button type="button" onclick="switchAdminTab('faq')" id="adminTabBtn-faq" class="w-full text-left px-3.5 py-2.5 rounded-xl font-medium text-xs transition-colors text-slate-600 hover:bg-slate-200/70 cursor-pointer flex items-center justify-between">
+              <span>❓ 자주 묻는 질문 관리</span>
+              <span id="adminFaqCountBadge" class="bg-slate-200 text-slate-700 text-[10px] px-1.5 py-0.2 rounded-full font-bold">4</span>
+            </button>
             <button type="button" onclick="switchAdminTab('media')" id="adminTabBtn-media" class="w-full text-left px-3.5 py-2.5 rounded-xl font-medium text-xs transition-colors text-slate-600 hover:bg-slate-200/70 cursor-pointer flex items-center gap-1.5">
               <span>🎬</span> 메인 미디어 관리
             </button>
@@ -1625,6 +1737,111 @@
             </div>
           </div>
 
+          <!-- 탭 4: 자주 묻는 질문(FAQ) 관리 (관리자 전용) -->
+          <div id="adminTab-faq" class="hidden space-y-4">
+            
+            <!-- 상단 요약 바 & 컨트롤 -->
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pb-3 border-b border-slate-100">
+              <div>
+                <div class="flex items-center gap-2">
+                  <h4 class="font-bold text-slate-900 text-base">자주 묻는 질문(FAQ) 등록 및 관리 센터</h4>
+                  <span id="adminFaqTotalBadge" class="bg-slate-900 text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full">총 4개</span>
+                </div>
+                <p class="text-[11px] text-slate-400 mt-0.5">홈페이지 '자주 묻는 질문' 탭에 실시간 노출되는 질문과 답변을 추가, 수정, 순서 변경 및 삭제할 수 있습니다.</p>
+              </div>
+
+              <div class="flex items-center gap-2 self-stretch sm:self-auto">
+                <button type="button" onclick="openAddFaqForm()" class="text-xs bg-slate-900 hover:bg-slate-800 text-white font-bold px-3.5 py-2 rounded-xl transition-colors cursor-pointer flex items-center gap-1.5 shadow-2xs">
+                  <span>➕</span> 새 질문 추가
+                </button>
+                <button type="button" onclick="loadAdminFaqs()" class="text-xs bg-slate-100 hover:bg-slate-200 px-2.5 py-2 rounded-xl text-slate-700 font-medium transition-colors cursor-pointer flex items-center gap-1">
+                  <span>↺</span> 새로고침
+                </button>
+              </div>
+            </div>
+
+            <!-- 관리자 실시간 반영 안내 배너 -->
+            <div class="p-3 bg-emerald-50 rounded-xl border border-emerald-200 text-xs text-emerald-950 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+              <div class="flex items-center gap-2">
+                <span class="text-base">💡</span>
+                <span><b>실시간 반영 안내</b>: 여기서 추가하거나 수정한 질문은 저장 즉시 홈페이지 '자주 묻는 질문' 화면에 바로 적용됩니다.</span>
+              </div>
+              <button type="button" onclick="previewFaqOnSite()" class="bg-emerald-200 hover:bg-emerald-300 text-emerald-950 font-bold px-2.5 py-1 rounded-md text-[11px] transition-colors cursor-pointer shrink-0">
+                👁️ 홈페이지에서 즉시 확인 ↗
+              </button>
+            </div>
+
+            <!-- FAQ 등록 / 수정 폼 카드 -->
+            <div id="adminFaqFormCard" class="hidden bg-slate-50 border-2 border-slate-900/10 rounded-2xl p-5 shadow-sm space-y-4">
+              <div class="flex justify-between items-center pb-2 border-b border-slate-200">
+                <div class="flex items-center gap-2">
+                  <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+                  <h5 id="adminFaqFormTitle" class="font-bold text-slate-900 text-sm">새 질문 및 답변 등록</h5>
+                </div>
+                <button type="button" onclick="closeFaqForm()" class="text-slate-400 hover:text-slate-600 text-xs cursor-pointer p-1">✕ 닫기</button>
+              </div>
+              
+              <input type="hidden" id="adminFaqEditId" value="" />
+              
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 mb-1">카테고리 분류</label>
+                  <select id="adminFaqCategory" class="w-full text-xs px-3 py-2 rounded-xl border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-slate-900 font-medium">
+                    <option value="주문/배송">주문/배송</option>
+                    <option value="교환/환불">교환/환불</option>
+                    <option value="상품/사이즈">상품/사이즈</option>
+                    <option value="대량주문">대량주문/납품</option>
+                    <option value="일반문의">일반/기타문의</option>
+                  </select>
+                </div>
+                <div class="sm:col-span-2">
+                  <label class="block text-xs font-bold text-slate-700 mb-1">질문 제목 (Q) <span class="text-red-500">*</span></label>
+                  <input type="text" id="adminFaqQuestion" placeholder="고객이 궁금해할 질문을 입력하세요 (예: 야간 및 공휴일에도 즉시 배송이 되나요?)" class="w-full text-xs px-3 py-2 rounded-xl border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-slate-900 font-medium" />
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">상세 답변 내용 (A) <span class="text-red-500">*</span></label>
+                <textarea id="adminFaqAnswer" rows="4" placeholder="정갈하고 상세한 안내 답변을 입력해주세요." class="w-full text-xs p-3 rounded-xl border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-slate-900 leading-relaxed font-sans"></textarea>
+              </div>
+
+              <div class="flex justify-between items-center pt-2">
+                <span class="text-[11px] text-slate-400">* 저장 시 즉시 방문자 화면 및 클라우드 DB에 동기화됩니다.</span>
+                <div class="flex items-center gap-2">
+                  <button type="button" onclick="closeFaqForm()" class="text-xs px-3.5 py-2 rounded-xl text-slate-600 hover:bg-slate-200 transition-colors cursor-pointer font-medium">
+                    취소
+                  </button>
+                  <button type="button" onclick="saveAdminFaq()" class="text-xs bg-slate-900 hover:bg-slate-800 text-white font-bold px-4 py-2 rounded-xl transition-colors cursor-pointer flex items-center gap-1.5 shadow-2xs">
+                    <span>💾</span> <span id="adminFaqSubmitBtnText">질문 등록 완료</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- 검색 및 카테고리 필터 -->
+            <div class="flex flex-col sm:flex-row gap-2 justify-between items-stretch sm:items-center">
+              <div class="relative flex-1">
+                <input type="text" id="adminFaqSearchInput" oninput="searchAdminFaqs()" placeholder="질문 제목 또는 답변 내용 검색..." class="w-full pl-8 pr-3 py-2 text-xs bg-slate-100 rounded-xl border-none focus:ring-1 focus:ring-slate-300 focus:bg-white transition-all" />
+                <span class="absolute left-2.5 top-2.5 text-slate-400 text-xs">🔍</span>
+              </div>
+              <div class="flex gap-1 overflow-x-auto pb-1 sm:pb-0 text-xs font-medium" id="adminFaqCatFilterGroup">
+                <button type="button" onclick="filterAdminFaqCat('all')" id="adminFaqCatBtn-all" class="px-2.5 py-1 rounded-md bg-white text-slate-900 font-bold shadow-2xs cursor-pointer shrink-0">전체</button>
+                <button type="button" onclick="filterAdminFaqCat('주문/배송')" id="adminFaqCatBtn-주문/배송" class="px-2.5 py-1 rounded-md text-slate-600 hover:text-slate-900 cursor-pointer shrink-0">주문/배송</button>
+                <button type="button" onclick="filterAdminFaqCat('교환/환불')" id="adminFaqCatBtn-교환/환불" class="px-2.5 py-1 rounded-md text-slate-600 hover:text-slate-900 cursor-pointer shrink-0">교환/환불</button>
+                <button type="button" onclick="filterAdminFaqCat('상품/사이즈')" id="adminFaqCatBtn-상품/사이즈" class="px-2.5 py-1 rounded-md text-slate-600 hover:text-slate-900 cursor-pointer shrink-0">상품/사이즈</button>
+                <button type="button" onclick="filterAdminFaqCat('대량주문')" id="adminFaqCatBtn-대량주문" class="px-2.5 py-1 rounded-md text-slate-600 hover:text-slate-900 cursor-pointer shrink-0">대량주문</button>
+              </div>
+            </div>
+
+            <!-- FAQ 관리 목록 카드 컨테이너 -->
+            <div id="adminFaqListContainer" class="space-y-3">
+              <div class="p-8 text-center text-slate-400 text-xs bg-slate-50 rounded-xl border border-slate-200">
+                질문 목록을 불러오는 중입니다...
+              </div>
+            </div>
+
+          </div>
+
           <!-- 탭 3: 메인 미디어 관리 (대표 사진 & 9:16 쇼츠 동영상) -->
           <div id="adminTab-media" class="hidden space-y-6">
             <div class="border-b border-slate-100 pb-3">
@@ -1732,7 +1949,7 @@
               <div class="p-3.5 bg-amber-50 rounded-xl border border-amber-200 text-xs text-amber-900 space-y-2">
                 <div class="flex items-center justify-between font-bold">
                   <span>⚠️ Supabase RLS(행 보안) 1초 해제 안내</span>
-                  <button type="button" onclick="navigator.clipboard.writeText('CREATE TABLE IF NOT EXISTS members (id text primary key, username text unique, password text, name text, phone text, created_at timestamp with time zone default timezone('utc'::text, now())); ALTER TABLE members DISABLE ROW LEVEL SECURITY; ALTER TABLE inquiries DISABLE ROW LEVEL SECURITY; ALTER TABLE products DISABLE ROW LEVEL SECURITY;'); showToast('✓ 복사되었습니다! Supabase SQL Editor에 붙여넣기 하세요.');" class="bg-amber-200 hover:bg-amber-300 text-amber-950 px-2 py-1 rounded text-[11px] font-bold cursor-pointer transition-colors">
+                  <button type="button" onclick="navigator.clipboard.writeText('CREATE TABLE IF NOT EXISTS members (id text primary key, username text unique, password text, name text, phone text, created_at timestamp with time zone default timezone('utc'::text, now())); CREATE TABLE IF NOT EXISTS inquiries (id text primary key, name text, phone text, details text, status text, note text, created_at timestamp with time zone default timezone('utc'::text, now())); CREATE TABLE IF NOT EXISTS products (id text primary key, name text, price text, created_at timestamp with time zone default timezone('utc'::text, now())); CREATE TABLE IF NOT EXISTS faqs (id text primary key, question text, answer text, category text, sort_order int, created_at timestamp with time zone default timezone('utc'::text, now())); ALTER TABLE members DISABLE ROW LEVEL SECURITY; ALTER TABLE inquiries DISABLE ROW LEVEL SECURITY; ALTER TABLE products DISABLE ROW LEVEL SECURITY; ALTER TABLE faqs DISABLE ROW LEVEL SECURITY;'); showToast('✓ 복사되었습니다! Supabase SQL Editor에 붙여넣기 하세요.');" class="bg-amber-200 hover:bg-amber-300 text-amber-950 px-2 py-1 rounded text-[11px] font-bold cursor-pointer transition-colors">
                     📋 SQL 명령어 복사
                   </button>
                 </div>
@@ -1740,7 +1957,7 @@
                   Supabase 대시보드(<a href="https://supabase.com/dashboard" target="_blank" class="underline font-bold">supabase.com</a>)의 <b>SQL Editor</b>에 아래 1줄을 붙여넣고 [Run]을 누르시면 클라우드 실시간 저장이 완전히 허용됩니다:
                 </p>
                 <code class="block p-2 bg-white rounded border border-amber-200 font-mono text-[11px] text-slate-800 select-all">
-                  CREATE TABLE IF NOT EXISTS members (id text primary key, username text unique, password text, name text, phone text, created_at timestamp with time zone default timezone('utc'::text, now())); ALTER TABLE members DISABLE ROW LEVEL SECURITY; ALTER TABLE inquiries DISABLE ROW LEVEL SECURITY; ALTER TABLE products DISABLE ROW LEVEL SECURITY;
+                  CREATE TABLE IF NOT EXISTS members (id text primary key, username text unique, password text, name text, phone text, created_at timestamp with time zone default timezone('utc'::text, now())); CREATE TABLE IF NOT EXISTS inquiries (id text primary key, name text, phone text, details text, status text, note text, created_at timestamp with time zone default timezone('utc'::text, now())); CREATE TABLE IF NOT EXISTS products (id text primary key, name text, price text, created_at timestamp with time zone default timezone('utc'::text, now())); CREATE TABLE IF NOT EXISTS faqs (id text primary key, question text, answer text, category text, sort_order int, created_at timestamp with time zone default timezone('utc'::text, now())); ALTER TABLE members DISABLE ROW LEVEL SECURITY; ALTER TABLE inquiries DISABLE ROW LEVEL SECURITY; ALTER TABLE products DISABLE ROW LEVEL SECURITY; ALTER TABLE faqs DISABLE ROW LEVEL SECURITY;
                 </code>
               </div>
             </div>
@@ -2013,6 +2230,11 @@
           : '<span>🔐</span> 관리자 모드';
       }
     }
+      const faqAdminBar = document.getElementById('userFaqAdminBar');
+      if (faqAdminBar) {
+        if (adminAuthed) faqAdminBar.classList.remove('hidden');
+        else faqAdminBar.classList.add('hidden');
+      }
 
     // --- 대표 모델 이미지 업로드 및 복원 로직 ---
     function handleHeroImageUpload(e) {
@@ -2206,6 +2428,7 @@
 
     // 대시보드 화면 표시
     function showAdminDashboard() {
+      updateAdminFaqMetrics();
       const loginForm = document.getElementById('adminLoginForm');
       const dashView = document.getElementById('adminDashboardView');
       if (loginForm) loginForm.style.display = 'none';
@@ -2246,30 +2469,37 @@
     // 탭 전환 (문의 vs 상품 vs 메인 미디어)
     function switchAdminTab(tab) {
       const inqTab = document.getElementById('adminTab-inquiries');
+      const membersTab = document.getElementById('adminTab-members');
       const prodTab = document.getElementById('adminTab-products');
+      const faqTab = document.getElementById('adminTab-faq');
       const mediaTab = document.getElementById('adminTab-media');
+      const deployTab = document.getElementById('adminTab-deploy');
 
       const inqBtn = document.getElementById('adminTabBtn-inquiries');
+      const membersBtn = document.getElementById('adminTabBtn-members');
       const prodBtn = document.getElementById('adminTabBtn-products');
+      const faqBtn = document.getElementById('adminTabBtn-faq');
       const mediaBtn = document.getElementById('adminTabBtn-media');
+      const deployBtn = document.getElementById('adminTabBtn-deploy');
 
       // Hide all tabs
       if (inqTab) inqTab.classList.add('hidden');
+      if (membersTab) membersTab.classList.add('hidden');
       if (prodTab) prodTab.classList.add('hidden');
+      if (faqTab) faqTab.classList.add('hidden');
       if (mediaTab) mediaTab.classList.add('hidden');
+      if (deployTab) deployTab.classList.add('hidden');
 
       // Reset button styles
       const defaultBtnClass = 'w-full text-left px-3.5 py-2.5 rounded-xl font-medium text-xs transition-colors text-slate-600 hover:bg-slate-200/70 cursor-pointer';
       const activeBtnClass = 'w-full text-left px-3.5 py-2.5 rounded-xl font-medium text-xs transition-colors bg-slate-900 text-white cursor-pointer';
 
       if (inqBtn) inqBtn.className = defaultBtnClass + ' flex items-center justify-between';
-      if (prodBtn) prodBtn.className = defaultBtnClass;
-      if (mediaBtn) mediaBtn.className = defaultBtnClass + ' flex items-center gap-1.5';
-
-      const membersTab = document.getElementById('adminTab-members');
-      const membersBtn = document.getElementById('adminTabBtn-members');
-      if (membersTab) membersTab.classList.add('hidden');
       if (membersBtn) membersBtn.className = defaultBtnClass + ' flex items-center justify-between';
+      if (prodBtn) prodBtn.className = defaultBtnClass;
+      if (faqBtn) faqBtn.className = defaultBtnClass + ' flex items-center justify-between';
+      if (mediaBtn) mediaBtn.className = defaultBtnClass + ' flex items-center gap-1.5';
+      if (deployBtn) deployBtn.className = defaultBtnClass + ' flex items-center gap-1.5 text-emerald-700 bg-emerald-50 hover:bg-emerald-100/80';
 
       if (tab === 'inquiries') {
         if (inqTab) inqTab.classList.remove('hidden');
@@ -2283,13 +2513,15 @@
         if (prodTab) prodTab.classList.remove('hidden');
         if (prodBtn) prodBtn.className = activeBtnClass;
         renderAdminProducts();
+      } else if (tab === 'faq') {
+        if (faqTab) faqTab.classList.remove('hidden');
+        if (faqBtn) faqBtn.className = activeBtnClass + ' flex items-center justify-between';
+        loadAdminFaqs();
       } else if (tab === 'media') {
         if (mediaTab) mediaTab.classList.remove('hidden');
         if (mediaBtn) mediaBtn.className = activeBtnClass + ' flex items-center gap-1.5';
         updateAdminMediaPreviews();
       } else if (tab === 'deploy') {
-        const deployTab = document.getElementById('adminTab-deploy');
-        const deployBtn = document.getElementById('adminTabBtn-deploy');
         if (deployTab) deployTab.classList.remove('hidden');
         if (deployBtn) deployBtn.className = activeBtnClass + ' flex items-center gap-1.5 text-white bg-slate-900';
         const tokInput = document.getElementById('ghTokenInput');
@@ -2786,6 +3018,587 @@
       }
     }
 
+
+    // ==================== 자주 묻는 질문(FAQ) 관리 시스템 ====================
+    const DEFAULT_FAQS = [
+      {
+        id: 'faq_1',
+        category: '주문/배송',
+        question: '주문 후 배송까지 얼마나 걸리나요?',
+        answer: '최대한 빠르고 안전하게 당일 또는 익일 배송을 원칙으로 하고 있습니다. 급하신 경우 백재상례복(010-3112-6730)으로 연락 주시면 맞춤 배송을 신속히 안내해 드립니다.',
+        sort_order: 1,
+        created_at: '2026-10-21T00:00:00.000Z'
+      },
+      {
+        id: 'faq_2',
+        category: '교환/환불',
+        question: '사이즈 교환이나 환불이 가능한가요?',
+        answer: '발인 전 미착용 상품에 한하여 백재상례복으로 접수 시 교환 및 환불이 가능합니다. 단, 상품을 한 번이라도 착용하신 흔적이 발견되면 교환이 불가합니다.',
+        sort_order: 2,
+        created_at: '2026-10-21T00:00:00.000Z'
+      },
+      {
+        id: 'faq_3',
+        category: '대량주문',
+        question: '장례식장 납품이나 대량 주문 계약도 가능한가요?',
+        answer: '네, 전국 병원 및 전문 장례식장 전용 정기 납품 계약과 대량 주문을 상시 지원하고 있습니다. 고객센터(010-3112-6730) 또는 1:1 상담 문의로 연락 주시면 전용 특별 단가표와 맞춤 혜택을 신속히 안내해 드립니다.',
+        sort_order: 3,
+        created_at: '2026-10-21T00:00:00.000Z'
+      },
+      {
+        id: 'faq_4',
+        category: '상품/사이즈',
+        question: '체형별 추천 사이즈 및 남녀 복식 구성은 어떻게 되나요?',
+        answer: '백재상례복의 남성 상·하의 양복과 여성 개량한복은 표준 예식 규격에 맞춰 편안하고 품격 있는 핏으로 엄선 제작됩니다. 키와 체형에 맞춘 상세 치수 선택이 고민되실 경우 키와 평소 옷 사이즈를 알려주시면 가장 알맞은 호수로 준비해 드립니다.',
+        sort_order: 4,
+        created_at: '2026-10-21T00:00:00.000Z'
+      }
+    ];
+
+    let adminFaqsData = [...DEFAULT_FAQS];
+    let currentAdminFaqCatFilter = 'all';
+    let currentUserFaqCategory = 'all';
+    let currentUserFaqSearch = '';
+
+    // FAQ 초기 로드 및 복원
+    async function initFaqs() {
+      try {
+        const cached = JSON.parse(localStorage.getItem('baekjae_faqs') || 'null');
+        if (Array.isArray(cached) && cached.length > 0) {
+          adminFaqsData = cached;
+        } else {
+          adminFaqsData = [...DEFAULT_FAQS];
+          localStorage.setItem('baekjae_faqs', JSON.stringify(adminFaqsData));
+        }
+      } catch(e) {
+        adminFaqsData = [...DEFAULT_FAQS];
+      }
+
+      // Supabase 동기화 시도
+      const activeSb = window.sbClient || (window.supabase && window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_KEY));
+      if (activeSb) {
+        try {
+          const { data, error } = await activeSb.from('faqs').select('*').order('sort_order', { ascending: true });
+          if (data && data.length > 0) {
+            adminFaqsData = data;
+            localStorage.setItem('baekjae_faqs', JSON.stringify(adminFaqsData));
+          }
+        } catch(err) {
+          console.warn("Supabase faqs sync note:", err);
+        }
+      }
+
+      updateAdminFaqMetrics();
+      renderUserFaqs();
+    }
+
+    // 뱃지 및 통계 갱신
+    function updateAdminFaqMetrics() {
+      const count = adminFaqsData.length;
+      const countBadge = document.getElementById('adminFaqCountBadge');
+      if (countBadge) countBadge.textContent = count;
+      const totalBadge = document.getElementById('adminFaqTotalBadge');
+      if (totalBadge) totalBadge.textContent = '총 ' + count + '개';
+    }
+
+    // 고객 화면 FAQ 렌더링
+    function renderUserFaqs() {
+      const container = document.getElementById('userFaqContainer');
+      if (!container) return;
+
+      let list = [...adminFaqsData];
+
+      // 카테고리 필터
+      if (currentUserFaqCategory !== 'all') {
+        list = list.filter(f => (f.category || '일반문의') === currentUserFaqCategory);
+      }
+
+      // 검색어 필터
+      if (currentUserFaqSearch) {
+        const q = currentUserFaqSearch.toLowerCase();
+        list = list.filter(f => 
+          (f.question && f.question.toLowerCase().includes(q)) || 
+          (f.answer && f.answer.toLowerCase().includes(q))
+        );
+      }
+
+      if (list.length === 0) {
+        container.innerHTML = `
+          <div class="p-12 text-center bg-white rounded-2xl border border-slate-200 shadow-2xs">
+            <span class="text-3xl mb-2 block">🔍</span>
+            <p class="font-bold text-sm text-slate-800">해당 조건에 맞는 자주 묻는 질문이 없습니다.</p>
+            <p class="text-xs text-slate-400 mt-1">다른 검색어를 입력하시거나 1:1 상담 문의를 이용해 주세요.</p>
+            <button type="button" onclick="clearUserFaqSearch(); filterUserFaqCategory('all');" class="mt-4 px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-colors cursor-pointer">
+              전체 질문 보기
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      const categoryColorMap = {
+        '주문/배송': 'bg-blue-50 text-blue-700 border border-blue-200',
+        '교환/환불': 'bg-emerald-50 text-emerald-700 border border-emerald-200',
+        '상품/사이즈': 'bg-amber-50 text-amber-800 border border-amber-200',
+        '대량주문': 'bg-purple-50 text-purple-700 border border-purple-200',
+        '일반문의': 'bg-slate-100 text-slate-700 border border-slate-200'
+      };
+
+      container.innerHTML = list.map((item, idx) => {
+        const catClass = categoryColorMap[item.category] || 'bg-slate-100 text-slate-700 border border-slate-200';
+        const isOpen = idx === 0 && !currentUserFaqSearch && currentUserFaqCategory === 'all';
+        return `
+          <div class="faq-item bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-2xs transition-all hover:border-slate-300" data-faq-id="${item.id}" data-category="${item.category || '일반문의'}">
+            <button type="button" onclick="toggleFaqItem('${item.id}')" class="w-full flex items-center justify-between px-6 py-5 text-left focus:outline-none cursor-pointer select-none">
+              <div class="flex items-center gap-3.5 flex-1 pr-3">
+                <span class="text-xs font-bold px-2.5 py-1 rounded-lg ${catClass} shrink-0">${item.category || '일반'}</span>
+                <span class="font-bold text-slate-800 text-sm sm:text-base flex items-center">
+                  <span class="text-amber-600 mr-2.5 font-serif font-black text-lg">Q.</span>
+                  <span>${escapeHtml(item.question)}</span>
+                </span>
+              </div>
+              <span id="faq-chevron-${item.id}" class="w-8 h-8 rounded-full ${isOpen ? 'bg-slate-900 text-white' : 'bg-slate-50 text-slate-400'} flex items-center justify-center font-bold text-xs transition-colors shrink-0">
+                ${isOpen ? '▲' : '▼'}
+              </span>
+            </button>
+            <div id="faq-body-${item.id}" class="${isOpen ? 'block' : 'hidden'} px-6 py-5 bg-slate-50/70 border-t border-slate-100 text-slate-700 leading-relaxed text-sm">
+              <div class="flex items-start gap-3">
+                <span class="text-slate-400 font-serif font-black text-lg shrink-0 mt-[-2px]">A.</span>
+                <div class="flex-1 whitespace-pre-line leading-relaxed">${escapeHtml(item.answer)}</div>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // 아코디언 토글
+    function toggleFaqItem(id) {
+      const body = document.getElementById('faq-body-' + id);
+      const chevron = document.getElementById('faq-chevron-' + id);
+      if (!body) return;
+      const isHidden = body.classList.contains('hidden');
+      if (isHidden) {
+        body.classList.remove('hidden');
+        body.classList.add('block');
+        if (chevron) {
+          chevron.textContent = '▲';
+          chevron.classList.add('bg-slate-900', 'text-white');
+          chevron.classList.remove('bg-slate-50', 'text-slate-400');
+        }
+      } else {
+        body.classList.add('hidden');
+        body.classList.remove('block');
+        if (chevron) {
+          chevron.textContent = '▼';
+          chevron.classList.remove('bg-slate-900', 'text-white');
+          chevron.classList.add('bg-slate-50', 'text-slate-400');
+        }
+      }
+    }
+
+    // 레거시 함수 매핑
+    function toggleFaq(idx) {
+      toggleFaqItem('faq_' + idx);
+    }
+
+    // 고객 카테고리 필터
+    function filterUserFaqCategory(cat) {
+      currentUserFaqCategory = cat;
+      document.querySelectorAll('.faq-cat-pill').forEach(btn => {
+        if (btn.getAttribute('data-cat') === cat) {
+          btn.className = 'faq-cat-pill px-4 py-2 rounded-xl text-xs font-bold transition-all bg-slate-900 text-white shadow-2xs cursor-pointer';
+        } else {
+          btn.className = 'faq-cat-pill px-4 py-2 rounded-xl text-xs font-medium transition-all bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 cursor-pointer';
+        }
+      });
+      renderUserFaqs();
+    }
+
+    // 고객 실시간 검색
+    function handleUserFaqSearch(val) {
+      currentUserFaqSearch = (val || '').trim();
+      const clearBtn = document.getElementById('userFaqSearchClear');
+      if (clearBtn) {
+        if (currentUserFaqSearch) clearBtn.classList.remove('hidden');
+        else clearBtn.classList.add('hidden');
+      }
+      renderUserFaqs();
+    }
+
+    function clearUserFaqSearch() {
+      const inp = document.getElementById('userFaqSearchInput');
+      if (inp) inp.value = '';
+      handleUserFaqSearch('');
+    }
+
+    // HTML 특수문자 이스케이프
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/&/g, '&amp;')
+                        .replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;')
+                        .replace(/"/g, '&quot;')
+                        .replace(/'/g, '&#039;');
+    }
+
+    // ==================== 관리자 FAQ 관리 로직 ====================
+    async function loadAdminFaqs() {
+      const container = document.getElementById('adminFaqListContainer');
+      if (container) {
+        container.innerHTML = '<div class="p-8 text-center text-slate-400 text-xs bg-slate-50 rounded-xl border border-slate-200">FAQ 목록을 불러오는 중입니다...</div>';
+      }
+
+      // 1) 로컬 스토리지 복원
+      try {
+        const cached = JSON.parse(localStorage.getItem('baekjae_faqs') || 'null');
+        if (Array.isArray(cached) && cached.length > 0) {
+          adminFaqsData = cached;
+        }
+      } catch(e) {}
+
+      // 2) Supabase 조회 시도
+      const activeSb = window.sbClient || (window.supabase && window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_KEY));
+      if (activeSb) {
+        try {
+          const { data } = await activeSb.from('faqs').select('*').order('sort_order', { ascending: true });
+          if (data && data.length > 0) {
+            adminFaqsData = data;
+            localStorage.setItem('baekjae_faqs', JSON.stringify(adminFaqsData));
+          }
+        } catch(err) {
+          console.warn("Fetch faqs note:", err);
+        }
+      }
+
+      updateAdminFaqMetrics();
+      renderAdminFaqsList(adminFaqsData);
+      renderUserFaqs();
+    }
+
+    // 관리자 FAQ 목록 렌더링
+    function renderAdminFaqsList(list) {
+      const container = document.getElementById('adminFaqListContainer');
+      if (!container) return;
+
+      let displayList = list || adminFaqsData;
+      if (currentAdminFaqCatFilter !== 'all') {
+        displayList = displayList.filter(f => (f.category || '일반문의') === currentAdminFaqCatFilter);
+      }
+
+      if (displayList.length === 0) {
+        container.innerHTML = `
+          <div class="p-10 text-center bg-slate-50 rounded-2xl border border-slate-200 text-slate-500">
+            <span class="text-3xl mb-2 block">❓</span>
+            <p class="font-bold text-sm text-slate-700">등록된 자주 묻는 질문이 없습니다.</p>
+            <p class="text-xs text-slate-400 mt-1">[새 질문 추가] 버튼을 눌러 첫 번째 질문과 답변을 등록해보세요.</p>
+            <button type="button" onclick="openAddFaqForm()" class="mt-3 px-3.5 py-1.5 bg-slate-900 text-white rounded-xl text-xs font-bold hover:bg-slate-800 transition-colors cursor-pointer">
+              ➕ 새 질문 등록하기
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      const categoryColorMap = {
+        '주문/배송': 'bg-blue-50 text-blue-700 border-blue-200',
+        '교환/환불': 'bg-emerald-50 text-emerald-700 border-emerald-200',
+        '상품/사이즈': 'bg-amber-50 text-amber-800 border-amber-200',
+        '대량주문': 'bg-purple-50 text-purple-700 border-purple-200',
+        '일반문의': 'bg-slate-100 text-slate-700 border-slate-200'
+      };
+
+      container.innerHTML = displayList.map((item, index) => {
+        const isFirst = index === 0;
+        const isLast = index === displayList.length - 1;
+        const catClass = categoryColorMap[item.category] || 'bg-slate-100 text-slate-700 border-slate-200';
+
+        return `
+          <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 hover:border-slate-300 shadow-2xs transition-all space-y-3" id="adminFaqCard-${item.id}">
+            <!-- 상단: 카테고리 + 순서변경 + 액션버튼 -->
+            <div class="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-slate-100">
+              <div class="flex items-center gap-2">
+                <span class="text-[11px] font-bold px-2 py-0.5 rounded-md border ${catClass}">${item.category || '일반'}</span>
+                <span class="text-[11px] text-slate-400 font-mono">순번: #${index + 1}</span>
+              </div>
+
+              <div class="flex items-center gap-1.5">
+                <!-- 순서 변경 버튼 -->
+                <button type="button" onclick="moveAdminFaqUp('${item.id}')" ${isFirst ? 'disabled class="opacity-30 cursor-not-allowed"' : 'class="hover:bg-slate-100 cursor-pointer text-slate-600"'} class="w-7 h-7 rounded-lg border border-slate-200 flex items-center justify-center text-xs font-bold transition-colors" title="위로 이동">
+                  ▲
+                </button>
+                <button type="button" onclick="moveAdminFaqDown('${item.id}')" ${isLast ? 'disabled class="opacity-30 cursor-not-allowed"' : 'class="hover:bg-slate-100 cursor-pointer text-slate-600"'} class="w-7 h-7 rounded-lg border border-slate-200 flex items-center justify-center text-xs font-bold transition-colors" title="아래로 이동">
+                  ▼
+                </button>
+
+                <!-- 수정 버튼 -->
+                <button type="button" onclick="editAdminFaq('${item.id}')" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-lg text-xs font-bold transition-colors cursor-pointer flex items-center gap-1">
+                  <span>✏️</span> 수정
+                </button>
+
+                <!-- 삭제 버튼 -->
+                <button type="button" onclick="deleteAdminFaq('${item.id}')" class="px-2.5 py-1 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg text-xs font-bold transition-colors cursor-pointer flex items-center gap-1">
+                  <span>🗑️</span> 삭제
+                </button>
+              </div>
+            </div>
+
+            <!-- 질문 내용 -->
+            <div class="flex items-start gap-2.5">
+              <span class="font-serif font-black text-amber-600 text-base shrink-0">Q.</span>
+              <h5 class="font-bold text-slate-900 text-sm leading-snug flex-1">${escapeHtml(item.question)}</h5>
+            </div>
+
+            <!-- 답변 내용 -->
+            <div class="flex items-start gap-2.5 bg-slate-50 p-3.5 rounded-xl border border-slate-100 text-xs text-slate-600 leading-relaxed">
+              <span class="font-serif font-black text-slate-400 text-sm shrink-0">A.</span>
+              <p class="flex-1 whitespace-pre-line">${escapeHtml(item.answer)}</p>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // 새 질문 추가 폼 열기
+    function openAddFaqForm() {
+      const card = document.getElementById('adminFaqFormCard');
+      if (!card) return;
+      document.getElementById('adminFaqEditId').value = '';
+      document.getElementById('adminFaqFormTitle').textContent = '새 질문 및 답변 등록';
+      document.getElementById('adminFaqSubmitBtnText').textContent = '질문 등록 완료';
+      document.getElementById('adminFaqCategory').value = '주문/배송';
+      document.getElementById('adminFaqQuestion').value = '';
+      document.getElementById('adminFaqAnswer').value = '';
+      card.classList.remove('hidden');
+      card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      setTimeout(() => document.getElementById('adminFaqQuestion')?.focus(), 100);
+    }
+
+    // 폼 닫기
+    function closeFaqForm() {
+      const card = document.getElementById('adminFaqFormCard');
+      if (card) card.classList.add('hidden');
+    }
+
+    // 질문 수정 모드 진입
+    function editAdminFaq(id) {
+      const item = adminFaqsData.find(f => String(f.id) === String(id));
+      if (!item) return;
+
+      const card = document.getElementById('adminFaqFormCard');
+      if (!card) return;
+
+      document.getElementById('adminFaqEditId').value = item.id;
+      document.getElementById('adminFaqFormTitle').textContent = '질문 및 답변 수정 (ID: ' + item.id + ')';
+      document.getElementById('adminFaqSubmitBtnText').textContent = '수정사항 저장';
+      document.getElementById('adminFaqCategory').value = item.category || '주문/배송';
+      document.getElementById('adminFaqQuestion').value = item.question || '';
+      document.getElementById('adminFaqAnswer').value = item.answer || '';
+
+      card.classList.remove('hidden');
+      card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      setTimeout(() => document.getElementById('adminFaqQuestion')?.focus(), 100);
+    }
+
+    // FAQ 저장 (신규 등록 또는 기존 수정)
+    async function saveAdminFaq() {
+      const editId = document.getElementById('adminFaqEditId')?.value || '';
+      const category = document.getElementById('adminFaqCategory')?.value || '일반문의';
+      const question = (document.getElementById('adminFaqQuestion')?.value || '').trim();
+      const answer = (document.getElementById('adminFaqAnswer')?.value || '').trim();
+
+      if (!question) {
+        alert("질문 제목을 입력해주세요.");
+        document.getElementById('adminFaqQuestion')?.focus();
+        return;
+      }
+      if (!answer) {
+        alert("답변 내용을 입력해주세요.");
+        document.getElementById('adminFaqAnswer')?.focus();
+        return;
+      }
+
+      let targetItem = null;
+
+      if (editId) {
+        // 기존 질문 수정
+        adminFaqsData = adminFaqsData.map(f => {
+          if (String(f.id) === String(editId)) {
+            targetItem = {
+              ...f,
+              category,
+              question,
+              answer,
+              updated_at: new Date().toISOString()
+            };
+            return targetItem;
+          }
+          return f;
+        });
+      } else {
+        // 새 질문 생성
+        targetItem = {
+          id: 'faq_' + Date.now(),
+          category,
+          question,
+          answer,
+          sort_order: adminFaqsData.length + 1,
+          created_at: new Date().toISOString()
+        };
+        adminFaqsData.push(targetItem);
+      }
+
+      // 1) 로컬 스토리지 즉시 영구 저장
+      localStorage.setItem('baekjae_faqs', JSON.stringify(adminFaqsData));
+
+      // 2) Supabase 클라우드 DB 동기화 시도
+      const activeSb = window.sbClient || (window.supabase && window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_KEY));
+      if (activeSb && targetItem) {
+        try {
+          await activeSb.from('faqs').upsert({
+            id: targetItem.id,
+            category: targetItem.category,
+            question: targetItem.question,
+            answer: targetItem.answer,
+            sort_order: targetItem.sort_order || 0
+          });
+        } catch(err) {
+          console.warn("Supabase faq upsert note:", err);
+        }
+      }
+
+      closeFaqForm();
+      updateAdminFaqMetrics();
+      renderAdminFaqsList(adminFaqsData);
+      renderUserFaqs();
+      showToast(editId ? "✓ 질문 내용이 수정되었습니다." : "✓ 새 자주 묻는 질문이 등록되었습니다.");
+    }
+
+    // 질문 삭제
+    async function deleteAdminFaq(id) {
+      if (!confirm("이 자주 묻는 질문을 정말 삭제하시겠습니까?\n삭제하시면 홈페이지 방문자 화면에서도 즉시 제거됩니다.")) {
+        return;
+      }
+
+      adminFaqsData = adminFaqsData.filter(f => String(f.id) !== String(id));
+      localStorage.setItem('baekjae_faqs', JSON.stringify(adminFaqsData));
+
+      // Supabase 삭제 시도
+      const activeSb = window.sbClient || (window.supabase && window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_KEY));
+      if (activeSb) {
+        try {
+          await activeSb.from('faqs').delete().eq('id', id);
+        } catch(err) {
+          console.warn("Supabase faq delete note:", err);
+        }
+      }
+
+      updateAdminFaqMetrics();
+      renderAdminFaqsList(adminFaqsData);
+      renderUserFaqs();
+      showToast("✓ 자주 묻는 질문이 삭제되었습니다.");
+    }
+
+    // 순서 위로 이동
+    async function moveAdminFaqUp(id) {
+      const index = adminFaqsData.findIndex(f => String(f.id) === String(id));
+      if (index <= 0) return;
+
+      const temp = adminFaqsData[index - 1];
+      adminFaqsData[index - 1] = adminFaqsData[index];
+      adminFaqsData[index] = temp;
+
+      adminFaqsData.forEach((f, i) => { f.sort_order = i + 1; });
+      localStorage.setItem('baekjae_faqs', JSON.stringify(adminFaqsData));
+
+      // Supabase 업데이트
+      const activeSb = window.sbClient || (window.supabase && window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_KEY));
+      if (activeSb) {
+        try {
+          await activeSb.from('faqs').upsert(adminFaqsData.map(f => ({
+            id: f.id,
+            category: f.category,
+            question: f.question,
+            answer: f.answer,
+            sort_order: f.sort_order
+          })));
+        } catch(err) {}
+      }
+
+      renderAdminFaqsList(adminFaqsData);
+      renderUserFaqs();
+      showToast("✓ 순서가 변경되었습니다.");
+    }
+
+    // 순서 아래로 이동
+    async function moveAdminFaqDown(id) {
+      const index = adminFaqsData.findIndex(f => String(f.id) === String(id));
+      if (index === -1 || index >= adminFaqsData.length - 1) return;
+
+      const temp = adminFaqsData[index + 1];
+      adminFaqsData[index + 1] = adminFaqsData[index];
+      adminFaqsData[index] = temp;
+
+      adminFaqsData.forEach((f, i) => { f.sort_order = i + 1; });
+      localStorage.setItem('baekjae_faqs', JSON.stringify(adminFaqsData));
+
+      // Supabase 업데이트
+      const activeSb = window.sbClient || (window.supabase && window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_KEY));
+      if (activeSb) {
+        try {
+          await activeSb.from('faqs').upsert(adminFaqsData.map(f => ({
+            id: f.id,
+            category: f.category,
+            question: f.question,
+            answer: f.answer,
+            sort_order: f.sort_order
+          })));
+        } catch(err) {}
+      }
+
+      renderAdminFaqsList(adminFaqsData);
+      renderUserFaqs();
+      showToast("✓ 순서가 변경되었습니다.");
+    }
+
+    // 관리자 검색
+    function searchAdminFaqs() {
+      const q = (document.getElementById('adminFaqSearchInput')?.value || '').trim().toLowerCase();
+      if (!q) {
+        renderAdminFaqsList(adminFaqsData);
+        return;
+      }
+      const filtered = adminFaqsData.filter(f => 
+        (f.question && f.question.toLowerCase().includes(q)) || 
+        (f.answer && f.answer.toLowerCase().includes(q))
+      );
+      renderAdminFaqsList(filtered);
+    }
+
+    // 관리자 카테고리 필터
+    function filterAdminFaqCat(cat) {
+      currentAdminFaqCatFilter = cat;
+      const cats = ['all', '주문/배송', '교환/환불', '상품/사이즈', '대량주문'];
+      cats.forEach(c => {
+        const btn = document.getElementById('adminFaqCatBtn-' + c);
+        if (btn) {
+          if (c === cat) {
+            btn.className = 'px-2.5 py-1 rounded-md bg-white text-slate-900 font-bold shadow-2xs cursor-pointer shrink-0';
+          } else {
+            btn.className = 'px-2.5 py-1 rounded-md text-slate-600 hover:text-slate-900 cursor-pointer shrink-0';
+          }
+        }
+      });
+      renderAdminFaqsList(adminFaqsData);
+    }
+
+    // 홈페이지에서 즉시 확인 바로가기
+    function previewFaqOnSite() {
+      closeAdminModal();
+      switchTab('faq');
+    }
+
+
     // GitHub 개인 토큰 저장
     function saveGitHubToken() {
       const inp = document.getElementById('ghTokenInput');
@@ -2841,6 +3654,12 @@
         if (priceBlockRegex.test(updatedContent)) {
           const newBlock = 'const DEFAULT_PRICES = ' + JSON.stringify(savedPrices, null, 2).replace(/\n/g, '\n      ') + ';';
           updatedContent = updatedContent.replace(priceBlockRegex, newBlock);
+        }
+
+        const faqBlockRegex = /(const\s+DEFAULT_FAQS\s*=\s*)\[[\s\S]*?\];/;
+        if (faqBlockRegex.test(updatedContent)) {
+          const newFaqBlock = 'const DEFAULT_FAQS = ' + JSON.stringify(adminFaqsData, null, 2).replace(/\n/g, '\n      ') + ';';
+          updatedContent = updatedContent.replace(faqBlockRegex, newFaqBlock);
         }
 
         // 3) Commit back to GitHub
