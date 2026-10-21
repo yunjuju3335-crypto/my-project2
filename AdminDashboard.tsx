@@ -21,7 +21,8 @@ const INITIAL_PRODUCTS = [
 export default function AdminDashboard({ onExit }: AdminDashboardProps) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
-  const [adminTab, setAdminTab] = useState<'inquiries' | 'products' | 'media'>('inquiries');
+  const [adminTab, setAdminTab] = useState<'inquiries' | 'members' | 'products' | 'media'>('inquiries');
+  const [members, setMembers] = useState<any[]>([]);
   const [heroImage, setHeroImage] = useState<string>('home_model.jpg');
   
   const [inquiries, setInquiries] = useState<any[]>([]);
@@ -32,6 +33,7 @@ export default function AdminDashboard({ onExit }: AdminDashboardProps) {
   useEffect(() => {
     if (isAuthenticated) {
       fetchInquiries();
+      fetchMembers();
       fetchProducts();
     }
   }, [isAuthenticated]);
@@ -49,6 +51,15 @@ export default function AdminDashboard({ onExit }: AdminDashboardProps) {
       console.warn('Inquiries error:', e);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchMembers = async () => {
+    try {
+      const { data, error } = await supabase.from('members').select('*').order('created_at', { ascending: false });
+      if (data) setMembers(data);
+    } catch (e) {
+      console.warn('Members fetch note:', e);
     }
   };
 
@@ -203,6 +214,13 @@ export default function AdminDashboard({ onExit }: AdminDashboardProps) {
               )}
             </button>
             <button 
+              onClick={() => setAdminTab('members')} 
+              className={`w-full text-left px-4 py-3 rounded-xl transition-all flex items-center justify-between text-sm cursor-pointer ${adminTab === 'members' ? 'bg-slate-800 text-white font-bold shadow-sm' : 'hover:bg-slate-800/60 text-slate-400'}`}
+            >
+              <span>👥 회원 관리</span>
+              <span className="text-xs text-slate-500">{members.length}명</span>
+            </button>
+            <button 
               onClick={() => setAdminTab('products')} 
               className={`w-full text-left px-4 py-3 rounded-xl transition-all flex items-center justify-between text-sm cursor-pointer ${adminTab === 'products' ? 'bg-slate-800 text-white font-bold shadow-sm' : 'hover:bg-slate-800/60 text-slate-400'}`}
             >
@@ -298,6 +316,65 @@ export default function AdminDashboard({ onExit }: AdminDashboardProps) {
                             <a href={`tel:${req.phone}`} className="hover:underline text-slate-900">{req.phone}</a>
                           </td>
                           <td className="p-4 text-xs text-slate-600 leading-relaxed whitespace-pre-wrap">{req.details}</td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {adminTab === 'members' && (
+          <div>
+            <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-6">
+              <div>
+                <h2 className="text-2xl font-bold text-slate-900">회원 목록 관리</h2>
+                <p className="text-xs text-slate-500 mt-1">문의글 작성을 위해 가입한 회원 목록입니다. 관리자만 열람 및 관리할 수 있습니다.</p>
+              </div>
+              <button 
+                onClick={fetchMembers} 
+                className="self-start sm:self-auto px-3.5 py-2 text-xs bg-white border border-slate-200 rounded-lg hover:bg-slate-50 text-slate-700 font-medium transition-colors shadow-2xs cursor-pointer flex items-center gap-1.5"
+              >
+                <span>↺</span> 새로고침
+              </button>
+            </div>
+
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead className="bg-slate-50 border-b border-slate-200 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                    <tr>
+                      <th className="p-4">가입일시</th>
+                      <th className="p-4">아이디</th>
+                      <th className="p-4">회원명</th>
+                      <th className="p-4">연락처</th>
+                      <th className="p-4 text-center">관리 액션</th>
+                    </tr>
+                  </thead>
+                  <tbody className="text-sm divide-y divide-slate-100">
+                    {members.length === 0 ? (
+                      <tr>
+                        <td colSpan={5} className="p-12 text-center text-slate-400 text-sm">
+                          아직 가입된 회원이 없습니다.
+                        </td>
+                      </tr>
+                    ) : (
+                      members.map((m) => (
+                        <tr key={m.id} className="hover:bg-slate-50/80 transition-colors">
+                          <td className="p-4 text-xs text-slate-400">
+                            {m.created_at ? new Date(m.created_at).toLocaleString('ko-KR') : '-'}
+                          </td>
+                          <td className="p-4 font-mono text-xs font-semibold text-slate-700">{m.username}</td>
+                          <td className="p-4 font-bold text-slate-900">{m.name}</td>
+                          <td className="p-4 font-mono text-xs text-slate-600">{m.phone}</td>
+                          <td className="p-4 text-center">
+                            <div className="flex items-center justify-center gap-2">
+                              <a href={`tel:${m.phone}`} className="px-2.5 py-1 bg-slate-900 text-white rounded text-xs font-bold hover:bg-slate-800">통화</a>
+                              <a href={`sms:${m.phone}`} className="px-2.5 py-1 bg-emerald-600 text-white rounded text-xs font-bold hover:bg-emerald-700">문자</a>
+                            </div>
+                          </td>
                         </tr>
                       ))
                     )}

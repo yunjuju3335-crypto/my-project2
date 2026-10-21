@@ -79,7 +79,20 @@
           <button type="button" onclick="switchTab('faq')" data-tab="faq" class="nav-btn flex items-center px-4 py-2 rounded-md text-sm font-medium transition-colors text-slate-600 hover:bg-slate-100 hover:text-slate-900 cursor-pointer">
             <span class="mr-1.5">❓</span> 자주묻는질문
           </button>
-          <button type="button" onclick="openAdminModal(); switchAdminTab('inquiries');" id="headerAdminBtn" class="flex items-center gap-1.5 ml-3 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-100 border border-slate-200 transition-colors cursor-pointer relative" title="관리자 콘솔 열기">
+          <!-- 일반 회원 로그인 / 상태 표시 영역 -->
+          <button type="button" onclick="openAuthModal('login')" id="headerUserBtn" class="flex items-center gap-1.5 ml-2 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-100 border border-slate-200 transition-colors cursor-pointer" title="회원 로그인 또는 가입">
+            <span>👤</span> 로그인 / 회원가입
+          </button>
+          <div id="headerUserInfo" class="hidden flex items-center gap-1.5 ml-2">
+            <span class="text-xs font-bold text-slate-800 bg-slate-100 px-2.5 py-1 rounded-lg flex items-center gap-1.5 border border-slate-200">
+              <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+              <span id="headerUserName">회원</span>님
+            </span>
+            <button type="button" onclick="logoutUser()" class="text-[11px] text-slate-400 hover:text-red-500 underline ml-0.5 cursor-pointer">로그아웃</button>
+          </div>
+
+          <!-- 관리자 모드 버튼 -->
+          <button type="button" onclick="openAdminModal(); switchAdminTab('inquiries');" id="headerAdminBtn" class="flex items-center gap-1.5 ml-2 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-100 border border-slate-200 transition-colors cursor-pointer relative" title="관리자 콘솔 열기">
             <span>🔐</span> 관리자 모드
             <span id="headerInquiryBadge" class="hidden ml-1 px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-red-500 text-white animate-pulse">0</span>
           </button>
@@ -101,6 +114,9 @@
         </button>
         <button type="button" onclick="switchTab('faq')" data-tab="faq" class="mobile-nav-btn flex flex-col items-center justify-center w-20 py-2 rounded-md text-xs font-medium transition-colors text-slate-500 hover:bg-slate-50 cursor-pointer">
           <span class="mb-1 text-sm">❓</span> 자주묻는질문
+        </button>
+        <button type="button" onclick="openAuthModal('login')" id="mobileUserBtn" class="mobile-nav-btn flex flex-col items-center justify-center w-20 py-2 rounded-md text-xs font-medium transition-colors text-slate-500 hover:bg-slate-50 cursor-pointer">
+          <span class="mb-1 text-sm">👤</span> <span id="mobileUserText">로그인</span>
         </button>
       </nav>
     </div>
@@ -616,30 +632,72 @@
       </div>
     </section>
 
-    <!-- 3. 문의하기 화면 -->
+    <!-- 3. 문의하기 화면 (회원 전용 접근 제한) -->
     <section id="page-inquiry" class="page-content animate-fade-in hidden pb-12">
       <div class="max-w-2xl mx-auto">
         <div class="mb-10 text-center">
           <h2 class="text-3xl font-serif font-bold text-slate-800 mb-3">문의하기</h2>
-          <p class="text-slate-500">궁금하신 점이나 대량 주문 문의를 남겨주시면 신속하게 답변해 드리겠습니다.</p>
+          <p class="text-slate-500">고객님의 소중한 상담 정보 보호를 위해 회원 로그인 후 1:1 맞춤 상담 접수가 가능합니다.</p>
         </div>
-        <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
+
+        <!-- 1) 비회원 접근 제한 안내 카드 (로그인 필요 시 표시) -->
+        <div id="inquiryLoginRequired" class="bg-white p-8 sm:p-10 rounded-3xl shadow-sm border border-slate-200 text-center space-y-6">
+          <div class="w-16 h-16 mx-auto rounded-2xl bg-slate-100 text-slate-800 flex items-center justify-center text-3xl shadow-2xs">
+            🔒
+          </div>
+          <div>
+            <span class="inline-block text-[11px] font-bold uppercase tracking-wider text-amber-800 bg-amber-100 px-3 py-1 rounded-full mb-2.5">Member Only</span>
+            <h3 class="text-xl font-bold text-slate-900 mb-2">회원 전용 1:1 맞춤 상담 문의</h3>
+            <p class="text-xs sm:text-sm text-slate-600 max-w-md mx-auto leading-relaxed">
+              백재상례복은 고객님의 의전 상담 내역을 안전하게 보존하고, 책임감 있는 1:1 전담 안내를 제공해드리기 위해 <b>회원가입 후 문의글 작성</b>을 지원하고 있습니다.
+            </p>
+          </div>
+
+          <div class="flex flex-col sm:flex-row items-center justify-center gap-3 max-w-sm mx-auto">
+            <button type="button" onclick="openAuthModal('login')" class="w-full sm:w-1/2 py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow-sm transition-all cursor-pointer flex items-center justify-center gap-1.5">
+              <span>🔑</span> 로그인하기
+            </button>
+            <button type="button" onclick="openAuthModal('register')" class="w-full sm:w-1/2 py-3 bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-xs rounded-xl shadow-sm transition-all cursor-pointer flex items-center justify-center gap-1.5">
+              <span>📝</span> 간편 회원가입
+            </button>
+          </div>
+
+          <div class="pt-4 border-t border-slate-100 text-xs text-slate-400">
+            급하신 장례 의전 및 즉시 상담은 로그인 없이 전화로 바로 연결 가능합니다:<br>
+            <a href="tel:010-3112-6730" class="font-bold text-slate-800 hover:underline inline-flex items-center gap-1 mt-1">
+              <span>📞</span> 010-3112-6730 (24시간 긴급 상담 직통)
+            </a>
+          </div>
+        </div>
+
+        <!-- 2) 회원 전용 문의 작성 폼 (로그인 완료 시 표시) -->
+        <div id="inquiryFormContainer" class="hidden bg-white p-8 rounded-3xl shadow-sm border border-slate-200">
+          <div class="mb-5 p-3.5 bg-emerald-50 rounded-xl border border-emerald-200 flex items-center justify-between text-xs text-emerald-900">
+            <span class="flex items-center gap-1.5 font-bold">
+              <span>✓</span> <span id="inquiryMemberName">회원</span> 회원님 인증 완료 (1:1 전담 상담 배정)
+            </span>
+            <span class="text-[11px] text-emerald-700 bg-white/80 px-2 py-0.5 rounded border border-emerald-200 font-semibold">회원 전용</span>
+          </div>
+
           <form id="inquiryForm" onsubmit="handleInquirySubmit(event)" class="space-y-6">
             <div>
               <label for="name" class="block text-sm font-medium text-slate-700 mb-2">성함 / 상호명</label>
-              <input type="text" id="name" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500" placeholder="홍길동" required>
+              <input type="text" id="name" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 bg-slate-50 font-medium" placeholder="홍길동" required readonly>
             </div>
             <div>
               <label for="phone" class="block text-sm font-medium text-slate-700 mb-2">연락처</label>
-              <input type="tel" id="phone" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500" placeholder="010-0000-0000" required>
+              <input type="tel" id="phone" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 bg-slate-50 font-medium" placeholder="010-0000-0000" required readonly>
             </div>
             <div>
               <label for="details" class="block text-sm font-medium text-slate-700 mb-2">문의 내용</label>
               <textarea id="details" rows="6" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 resize-none" placeholder="필요하신 품목, 수량, 배송 희망 장소 등을 상세히 적어주세요." required></textarea>
             </div>
-            <button type="submit" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-medium py-4 px-4 rounded-xl shadow-sm transition-colors cursor-pointer">문의 접수하기</button>
+            <button type="submit" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-medium py-4 px-4 rounded-xl shadow-sm transition-colors cursor-pointer flex items-center justify-center gap-2">
+              <span>📨</span> 문의 접수하기
+            </button>
           </form>
         </div>
+
       </div>
     </section>
 
@@ -953,6 +1011,14 @@
         adminAuthed = true;
       }
       updateAdminUI();
+      // 회원 로그인 세션 복원
+      try {
+        const sessionUser = JSON.parse(sessionStorage.getItem('baekjae_current_user') || 'null');
+        if (sessionUser) {
+          currentUser = sessionUser;
+        }
+      } catch(e) {}
+      updateUserAuthUI();
       // 고객 문의 알림 뱃지 초기화
       try {
         const cachedInqs = JSON.parse(localStorage.getItem('baekjae_inquiries') || '[]');
@@ -1317,6 +1383,83 @@
     }
   </script>
 
+  <!-- 일반 고객 회원가입 & 로그인 모달 (Auth Modal) -->
+  <div id="authModal" style="display: none;" class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl shadow-2xl border border-slate-200 w-full max-w-md overflow-hidden animate-fade-in">
+      
+      <!-- 모달 상단 헤더 -->
+      <div class="p-5 bg-slate-900 text-white flex justify-between items-center">
+        <div class="flex items-center gap-2.5">
+          <span class="p-2 rounded-xl bg-slate-800 text-lg">👤</span>
+          <div>
+            <h3 class="text-base font-bold" id="authModalTitle">백재상례복 회원 서비스</h3>
+            <p class="text-[11px] text-slate-400">1:1 맞춤 상담 문의 및 의전 안내</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeAuthModal()" class="p-2 text-slate-400 hover:text-white transition-colors text-lg cursor-pointer">✕</button>
+      </div>
+
+      <!-- 탭 스위처: 로그인 vs 회원가입 -->
+      <div class="grid grid-cols-2 p-2 bg-slate-100 border-b border-slate-200 text-xs font-bold text-center">
+        <button type="button" id="authTabBtn-login" onclick="switchAuthTab('login')" class="py-2.5 rounded-xl bg-white text-slate-900 shadow-2xs transition-all cursor-pointer">
+          🔑 로그인
+        </button>
+        <button type="button" id="authTabBtn-register" onclick="switchAuthTab('register')" class="py-2.5 rounded-xl text-slate-600 hover:text-slate-900 transition-all cursor-pointer">
+          📝 간편 회원가입
+        </button>
+      </div>
+
+      <div class="p-6">
+        <!-- 1) 로그인 폼 -->
+        <form id="userLoginForm" onsubmit="handleUserLogin(event)" class="space-y-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1.5">아이디</label>
+            <input type="text" id="loginUsername" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs focus:outline-none focus:ring-2 focus:ring-slate-800" placeholder="가입하신 아이디 입력" required>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1.5">비밀번호</label>
+            <input type="password" id="loginPassword" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs focus:outline-none focus:ring-2 focus:ring-slate-800" placeholder="비밀번호 입력" required>
+          </div>
+          <button type="submit" class="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl text-xs transition-colors shadow-sm cursor-pointer">
+            로그인하기
+          </button>
+          <div class="text-center pt-2">
+            <span class="text-xs text-slate-500">아직 회원이 아니신가요?</span>
+            <button type="button" onclick="switchAuthTab('register')" class="text-xs font-bold text-slate-900 hover:underline ml-1 cursor-pointer">간편 회원가입</button>
+          </div>
+        </form>
+
+        <!-- 2) 회원가입 폼 -->
+        <form id="userRegisterForm" onsubmit="handleUserRegister(event)" class="hidden space-y-3.5">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">아이디 <span class="text-red-500">*</span></label>
+            <input type="text" id="regUsername" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs focus:outline-none focus:ring-2 focus:ring-slate-800" placeholder="영문/숫자 4자 이상" required minlength="4">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">비밀번호 <span class="text-red-500">*</span></label>
+            <input type="password" id="regPassword" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs focus:outline-none focus:ring-2 focus:ring-slate-800" placeholder="비밀번호 4자 이상" required minlength="4">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">성함 / 상호명 <span class="text-red-500">*</span></label>
+            <input type="text" id="regName" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs focus:outline-none focus:ring-2 focus:ring-slate-800" placeholder="예: 홍길동" required>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">연락처 <span class="text-red-500">*</span></label>
+            <input type="tel" id="regPhone" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs focus:outline-none focus:ring-2 focus:ring-slate-800" placeholder="010-0000-0000" required>
+          </div>
+          <button type="submit" class="w-full py-3 bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold rounded-xl text-xs transition-colors shadow-sm cursor-pointer mt-2">
+            회원가입 완료 및 자동 로그인
+          </button>
+          <div class="text-center pt-2">
+            <span class="text-xs text-slate-500">이미 계정이 있으신가요?</span>
+            <button type="button" onclick="switchAuthTab('login')" class="text-xs font-bold text-slate-900 hover:underline ml-1 cursor-pointer">로그인</button>
+          </div>
+        </form>
+      </div>
+
+    </div>
+  </div>
+
   <!-- 관리자 대시보드 모달 (Admin Modal) -->
   <div id="adminModal" style="display: none;" class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl shadow-2xl border border-slate-200 w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden animate-fade-in">
@@ -1352,6 +1495,10 @@
             <button type="button" onclick="switchAdminTab('inquiries')" id="adminTabBtn-inquiries" class="w-full text-left px-3.5 py-2.5 rounded-xl font-medium text-xs transition-colors bg-slate-900 text-white cursor-pointer flex items-center justify-between">
               <span>📥 실시간 문의</span>
               <span id="adminInquiryBadge" class="bg-red-500 text-white text-[10px] px-1.5 py-0.2 rounded-full hidden">0</span>
+            </button>
+            <button type="button" onclick="switchAdminTab('members')" id="adminTabBtn-members" class="w-full text-left px-3.5 py-2.5 rounded-xl font-medium text-xs transition-colors text-slate-600 hover:bg-slate-200/70 cursor-pointer flex items-center justify-between">
+              <span>👥 회원 관리</span>
+              <span id="adminMemberCountBadge" class="bg-slate-200 text-slate-700 text-[10px] px-1.5 py-0.2 rounded-full font-bold">0</span>
             </button>
             <button type="button" onclick="switchAdminTab('products')" id="adminTabBtn-products" class="w-full text-left px-3.5 py-2.5 rounded-xl font-medium text-xs transition-colors text-slate-600 hover:bg-slate-200/70 cursor-pointer">
               🛍️ 상품 및 가격
@@ -1416,7 +1563,53 @@
 
           </div>
 
-          <!-- 탭 2: 상품 가격 관리 -->
+          <!-- 탭 2: 회원 목록 관리 (관리자 전용) -->
+          <div id="adminTab-members" class="hidden space-y-4">
+            
+            <!-- 상단 요약 바 & 검색 -->
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pb-3 border-b border-slate-100">
+              <div>
+                <div class="flex items-center gap-2">
+                  <h4 class="font-bold text-slate-900 text-base">가입 회원 목록 관리</h4>
+                  <span id="adminMemberTotalBadge" class="bg-slate-800 text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full">총 0명</span>
+                </div>
+                <p class="text-[11px] text-slate-400 mt-0.5">상담 문의 작성을 위해 가입한 회원 목록을 확인하고, 원클릭 통화/문자 및 회원 관리를 수행합니다.</p>
+              </div>
+
+              <div class="flex items-center gap-2 self-stretch sm:self-auto">
+                <input type="text" id="adminMemberSearchInput" oninput="searchAdminMembers()" placeholder="이름/연락처/아이디 검색..." class="px-3 py-1.5 text-xs bg-slate-100 border border-slate-200 rounded-lg focus:outline-none focus:border-slate-800 text-slate-800 w-48">
+                <button type="button" onclick="loadAdminMembers()" class="text-xs bg-slate-100 hover:bg-slate-200 px-2.5 py-1.5 rounded-lg text-slate-700 font-medium transition-colors cursor-pointer flex items-center gap-1">
+                  <span>↺</span> 새로고침
+                </button>
+              </div>
+            </div>
+
+            <!-- 회원 통계 요약 카드 -->
+            <div class="grid grid-cols-3 gap-3">
+              <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 text-center">
+                <span class="text-[11px] text-slate-500 font-medium block">총 가입 회원</span>
+                <span class="text-lg font-bold text-slate-900" id="statTotalMembers">0명</span>
+              </div>
+              <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 text-center">
+                <span class="text-[11px] text-slate-500 font-medium block">문의 접수 회원</span>
+                <span class="text-lg font-bold text-emerald-600" id="statInquiryMembers">0명</span>
+              </div>
+              <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 text-center">
+                <span class="text-[11px] text-slate-500 font-medium block">DB 저장 상태</span>
+                <span class="text-xs font-bold text-emerald-600" id="statMemberDbSync">클라우드 연동</span>
+              </div>
+            </div>
+
+            <!-- 회원 목록 렌더링 컨테이너 -->
+            <div id="adminMembersContainer" class="space-y-3">
+              <div class="p-8 text-center text-slate-400 text-xs bg-slate-50 rounded-xl border border-slate-200">
+                회원 목록을 불러오는 중입니다...
+              </div>
+            </div>
+
+          </div>
+
+          <!-- 탭 3: 상품 가격 관리 -->
           <div id="adminTab-products" class="hidden">
             <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-100">
               <div>
@@ -1539,7 +1732,7 @@
               <div class="p-3.5 bg-amber-50 rounded-xl border border-amber-200 text-xs text-amber-900 space-y-2">
                 <div class="flex items-center justify-between font-bold">
                   <span>⚠️ Supabase RLS(행 보안) 1초 해제 안내</span>
-                  <button type="button" onclick="navigator.clipboard.writeText('ALTER TABLE products DISABLE ROW LEVEL SECURITY; ALTER TABLE inquiries DISABLE ROW LEVEL SECURITY;'); showToast('✓ 복사되었습니다! Supabase SQL Editor에 붙여넣기 하세요.');" class="bg-amber-200 hover:bg-amber-300 text-amber-950 px-2 py-1 rounded text-[11px] font-bold cursor-pointer transition-colors">
+                  <button type="button" onclick="navigator.clipboard.writeText('CREATE TABLE IF NOT EXISTS members (id text primary key, username text unique, password text, name text, phone text, created_at timestamp with time zone default timezone('utc'::text, now())); ALTER TABLE members DISABLE ROW LEVEL SECURITY; ALTER TABLE inquiries DISABLE ROW LEVEL SECURITY; ALTER TABLE products DISABLE ROW LEVEL SECURITY;'); showToast('✓ 복사되었습니다! Supabase SQL Editor에 붙여넣기 하세요.');" class="bg-amber-200 hover:bg-amber-300 text-amber-950 px-2 py-1 rounded text-[11px] font-bold cursor-pointer transition-colors">
                     📋 SQL 명령어 복사
                   </button>
                 </div>
@@ -1547,7 +1740,7 @@
                   Supabase 대시보드(<a href="https://supabase.com/dashboard" target="_blank" class="underline font-bold">supabase.com</a>)의 <b>SQL Editor</b>에 아래 1줄을 붙여넣고 [Run]을 누르시면 클라우드 실시간 저장이 완전히 허용됩니다:
                 </p>
                 <code class="block p-2 bg-white rounded border border-amber-200 font-mono text-[11px] text-slate-800 select-all">
-                  ALTER TABLE products DISABLE ROW LEVEL SECURITY; ALTER TABLE inquiries DISABLE ROW LEVEL SECURITY;
+                  CREATE TABLE IF NOT EXISTS members (id text primary key, username text unique, password text, name text, phone text, created_at timestamp with time zone default timezone('utc'::text, now())); ALTER TABLE members DISABLE ROW LEVEL SECURITY; ALTER TABLE inquiries DISABLE ROW LEVEL SECURITY; ALTER TABLE products DISABLE ROW LEVEL SECURITY;
                 </code>
               </div>
             </div>
@@ -1595,6 +1788,193 @@
 
 
   <script>
+    // ========================================================
+    // --- 8. 회원 인증 및 관리자 콘솔 종합 제어 스크립트 ---
+    // ========================================================
+    let currentUser = null;
+    let adminMembersData = [];
+
+    // --- 회원 인증 시스템 (Auth System) ---
+    function openAuthModal(initialTab = 'login') {
+      const modal = document.getElementById('authModal');
+      if (modal) {
+        modal.style.display = 'flex';
+        switchAuthTab(initialTab);
+      }
+    }
+
+    function closeAuthModal() {
+      const modal = document.getElementById('authModal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    function switchAuthTab(tab) {
+      const loginForm = document.getElementById('userLoginForm');
+      const regForm = document.getElementById('userRegisterForm');
+      const loginBtn = document.getElementById('authTabBtn-login');
+      const regBtn = document.getElementById('authTabBtn-register');
+
+      if (tab === 'login') {
+        if (loginForm) loginForm.classList.remove('hidden');
+        if (regForm) regForm.classList.add('hidden');
+        if (loginBtn) loginBtn.className = 'py-2.5 rounded-xl bg-white text-slate-900 shadow-2xs font-bold transition-all cursor-pointer';
+        if (regBtn) regBtn.className = 'py-2.5 rounded-xl text-slate-600 hover:text-slate-900 transition-all cursor-pointer';
+        setTimeout(() => document.getElementById('loginUsername')?.focus(), 80);
+      } else {
+        if (regForm) regForm.classList.remove('hidden');
+        if (loginForm) loginForm.classList.add('hidden');
+        if (regBtn) regBtn.className = 'py-2.5 rounded-xl bg-white text-slate-900 shadow-2xs font-bold transition-all cursor-pointer';
+        if (loginBtn) loginBtn.className = 'py-2.5 rounded-xl text-slate-600 hover:text-slate-900 transition-all cursor-pointer';
+        setTimeout(() => document.getElementById('regUsername')?.focus(), 80);
+      }
+    }
+
+    // 회원가입 처리 (로컬 + Supabase DB 동시 저장)
+    async function handleUserRegister(e) {
+      e.preventDefault();
+      const username = document.getElementById('regUsername').value.trim();
+      const password = document.getElementById('regPassword').value.trim();
+      const name = document.getElementById('regName').value.trim();
+      const phone = document.getElementById('regPhone').value.trim();
+
+      // 중복 체크
+      let members = JSON.parse(localStorage.getItem('baekjae_members') || '[]');
+      if (members.some(m => m.username === username)) {
+        alert("이미 사용 중인 아이디입니다. 다른 아이디를 입력해주세요.");
+        document.getElementById('regUsername').focus();
+        return;
+      }
+
+      const newMember = {
+        id: 'mem_' + Date.now(),
+        username,
+        password,
+        name,
+        phone,
+        created_at: new Date().toISOString()
+      };
+
+      // 1) 로컬 스토리지 저장
+      members.unshift(newMember);
+      localStorage.setItem('baekjae_members', JSON.stringify(members));
+
+      // 2) Supabase 클라우드 DB 저장 시도
+      const activeSb = window.sbClient || (window.supabase && window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_KEY));
+      if (activeSb) {
+        try {
+          await activeSb.from('members').insert([{
+            id: newMember.id,
+            username: newMember.username,
+            password: newMember.password,
+            name: newMember.name,
+            phone: newMember.phone
+          }]);
+        } catch(err) {
+          console.warn("Member insert note:", err);
+        }
+      }
+
+      // 자동 로그인 처리
+      setCurrentUser(newMember);
+      closeAuthModal();
+      showToast(`🎉 ${name}님, 회원가입이 완료되었습니다!`);
+      alert(`🎉 회원가입이 완료되었습니다!\n\n${name}님, 환영합니다.\n이제 1:1 상담 문의 작성이 가능합니다.`);
+
+      // 문의 화면으로 자동 이동
+      switchTab('inquiry');
+    }
+
+    // 회원 로그인 처리
+    async function handleUserLogin(e) {
+      e.preventDefault();
+      const username = document.getElementById('loginUsername').value.trim();
+      const password = document.getElementById('loginPassword').value.trim();
+
+      // 1) 로컬 캐시에서 먼저 조회
+      let members = JSON.parse(localStorage.getItem('baekjae_members') || '[]');
+      let user = members.find(m => m.username === username && m.password === password);
+
+      // 2) 로컬에 없으면 Supabase에서 조회 시도
+      if (!user) {
+        const activeSb = window.sbClient || (window.supabase && window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_KEY));
+        if (activeSb) {
+          try {
+            const { data } = await activeSb.from('members').select('*').eq('username', username).eq('password', password);
+            if (data && data.length > 0) {
+              user = data[0];
+              // 로컬에 백업
+              members.unshift(user);
+              localStorage.setItem('baekjae_members', JSON.stringify(members));
+            }
+          } catch(err) {}
+        }
+      }
+
+      if (user) {
+        setCurrentUser(user);
+        closeAuthModal();
+        showToast(`✓ ${user.name}님, 로그인되었습니다.`);
+      } else {
+        alert("아이디 또는 비밀번호가 일치하지 않습니다.\n계정이 없으시면 [간편 회원가입]을 이용해주세요.");
+      }
+    }
+
+    // 현재 사용자 상태 변경 및 화면 UI 반영
+    function setCurrentUser(user) {
+      currentUser = user;
+      if (user) {
+        sessionStorage.setItem('baekjae_current_user', JSON.stringify(user));
+      } else {
+        sessionStorage.removeItem('baekjae_current_user');
+      }
+      updateUserAuthUI();
+    }
+
+    function logoutUser() {
+      setCurrentUser(null);
+      showToast("로그아웃되었습니다.");
+    }
+
+    // 회원 로그인 상태에 따른 화면 갱신
+    function updateUserAuthUI() {
+      const headerUserBtn = document.getElementById('headerUserBtn');
+      const headerUserInfo = document.getElementById('headerUserInfo');
+      const headerUserName = document.getElementById('headerUserName');
+      const mobileUserText = document.getElementById('mobileUserText');
+
+      const inqLoginReq = document.getElementById('inquiryLoginRequired');
+      const inqFormCont = document.getElementById('inquiryFormContainer');
+      const inqMemName = document.getElementById('inquiryMemberName');
+      const inqNameInput = document.getElementById('name');
+      const inqPhoneInput = document.getElementById('phone');
+
+      if (currentUser) {
+        // 로그인 상태
+        if (headerUserBtn) headerUserBtn.classList.add('hidden');
+        if (headerUserInfo) headerUserInfo.classList.remove('hidden');
+        if (headerUserName) headerUserName.textContent = currentUser.name || currentUser.username;
+        if (mobileUserText) mobileUserText.textContent = currentUser.name || '내정보';
+
+        // 문의 폼 활성화 & 개인정보 자동 입력
+        if (inqLoginReq) inqLoginReq.classList.add('hidden');
+        if (inqFormCont) inqFormCont.classList.remove('hidden');
+        if (inqMemName) inqMemName.textContent = currentUser.name;
+        if (inqNameInput) inqNameInput.value = currentUser.name;
+        if (inqPhoneInput) inqPhoneInput.value = currentUser.phone;
+      } else {
+        // 비로그인 상태
+        if (headerUserBtn) headerUserBtn.classList.remove('hidden');
+        if (headerUserInfo) headerUserInfo.classList.add('hidden');
+        if (mobileUserText) mobileUserText.textContent = '로그인';
+
+        // 문의 폼 차단 & 로그인 안내 카드 표시
+        if (inqLoginReq) inqLoginReq.classList.remove('hidden');
+        if (inqFormCont) inqFormCont.classList.add('hidden');
+        if (inqNameInput) inqNameInput.value = '';
+        if (inqPhoneInput) inqPhoneInput.value = '';
+      }
+    }
+
     // ========================================================
     // --- 9. 관리자 모달, 미디어 관리 및 Supabase 연동 스크립트 ---
     // ========================================================
@@ -1886,10 +2266,19 @@
       if (prodBtn) prodBtn.className = defaultBtnClass;
       if (mediaBtn) mediaBtn.className = defaultBtnClass + ' flex items-center gap-1.5';
 
+      const membersTab = document.getElementById('adminTab-members');
+      const membersBtn = document.getElementById('adminTabBtn-members');
+      if (membersTab) membersTab.classList.add('hidden');
+      if (membersBtn) membersBtn.className = defaultBtnClass + ' flex items-center justify-between';
+
       if (tab === 'inquiries') {
         if (inqTab) inqTab.classList.remove('hidden');
         if (inqBtn) inqBtn.className = activeBtnClass + ' flex items-center justify-between';
         loadAdminInquiries();
+      } else if (tab === 'members') {
+        if (membersTab) membersTab.classList.remove('hidden');
+        if (membersBtn) membersBtn.className = activeBtnClass + ' flex items-center justify-between';
+        loadAdminMembers();
       } else if (tab === 'products') {
         if (prodTab) prodTab.classList.remove('hidden');
         if (prodBtn) prodBtn.className = activeBtnClass;
@@ -2168,6 +2557,148 @@
       { id: 'aw1', name: '머리핀' },
       { id: 'aw2', name: '여성 양말 / 덧신' }
     ];
+
+    // --- 회원 목록 관리 (Admin Member Management) ---
+    async function loadAdminMembers() {
+      const container = document.getElementById('adminMembersContainer');
+      if (container) {
+        container.innerHTML = '<div class="p-8 text-center text-slate-400 text-xs bg-slate-50 rounded-xl border border-slate-200">회원 목록을 불러오는 중입니다...</div>';
+      }
+
+      // 1) 로컬 스토리지에서 복원
+      try {
+        const localMembers = JSON.parse(localStorage.getItem('baekjae_members') || '[]');
+        if (Array.isArray(localMembers)) {
+          adminMembersData = localMembers;
+        }
+      } catch(e) {}
+
+      // 2) Supabase 클라우드 DB에서 조회 시도
+      const activeSb = window.sbClient || (window.supabase && window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_KEY));
+      if (activeSb) {
+        try {
+          const { data } = await activeSb.from('members').select('*').order('created_at', { ascending: false });
+          if (data && data.length > 0) {
+            adminMembersData = data;
+            localStorage.setItem('baekjae_members', JSON.stringify(adminMembersData));
+          }
+        } catch(e) {
+          console.warn("Fetch members note:", e);
+        }
+      }
+
+      updateAdminMemberMetrics();
+      renderAdminMembersList(adminMembersData);
+    }
+
+    // 회원 통계 뱃지 업데이트
+    function updateAdminMemberMetrics() {
+      const count = adminMembersData.length;
+      const countBadge = document.getElementById('adminMemberCountBadge');
+      if (countBadge) countBadge.textContent = count;
+      const totalBadge = document.getElementById('adminMemberTotalBadge');
+      if (totalBadge) totalBadge.textContent = '총 ' + count + '명';
+      const statTotal = document.getElementById('statTotalMembers');
+      if (statTotal) statTotal.textContent = count + '명';
+
+      // 문의 이력이 있는 회원 수
+      const inqUserPhones = new Set(adminInquiriesData.map(i => (i.phone || '').replace(/[^0-9]/g, '')));
+      const matched = adminMembersData.filter(m => inqUserPhones.has((m.phone || '').replace(/[^0-9]/g, ''))).length;
+      const statInq = document.getElementById('statInquiryMembers');
+      if (statInq) statInq.textContent = matched + '명';
+    }
+
+    // 회원 검색
+    function searchAdminMembers() {
+      const q = (document.getElementById('adminMemberSearchInput')?.value || '').trim().toLowerCase();
+      if (!q) {
+        renderAdminMembersList(adminMembersData);
+        return;
+      }
+      const filtered = adminMembersData.filter(m => 
+        (m.name && m.name.toLowerCase().includes(q)) ||
+        (m.username && m.username.toLowerCase().includes(q)) ||
+        (m.phone && m.phone.includes(q))
+      );
+      renderAdminMembersList(filtered);
+    }
+
+    // 회원 목록 렌더링
+    function renderAdminMembersList(list) {
+      const container = document.getElementById('adminMembersContainer');
+      if (!container) return;
+
+      if (!list || list.length === 0) {
+        container.innerHTML = `
+          <div class="p-10 text-center bg-slate-50 rounded-2xl border border-slate-200 text-slate-500">
+            <span class="text-3xl mb-2 block">👥</span>
+            <p class="font-bold text-sm text-slate-700">등록된 회원이 없습니다.</p>
+            <p class="text-xs text-slate-400 mt-1">고객이 홈페이지에서 회원가입을 완료하면 여기에 실시간으로 표시됩니다.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = list.map(m => {
+        const dateStr = m.created_at ? new Date(m.created_at).toLocaleString('ko-KR') : '가입일 미상';
+        const cleanPhone = (m.phone || '').replace(/[^0-9]/g, '');
+        // 이 회원의 문의 건수 확인
+        const userInquiries = adminInquiriesData.filter(i => (i.phone || '').replace(/[^0-9]/g, '') === cleanPhone);
+
+        return `
+          <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-2xs hover:border-slate-300 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="flex items-center gap-3.5">
+              <span class="w-11 h-11 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-lg font-bold text-slate-700 shrink-0">
+                👤
+              </span>
+              <div>
+                <div class="flex items-center gap-2">
+                  <h5 class="font-bold text-slate-900 text-sm">${m.name || '성함 미기재'}</h5>
+                  <span class="text-[11px] bg-slate-100 text-slate-600 px-2 py-0.2 rounded font-mono">ID: ${m.username}</span>
+                  ${userInquiries.length > 0 ? `<span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-1.5 py-0.2 rounded-full">문의 ${userInquiries.length}건</span>` : ''}
+                </div>
+                <div class="flex items-center gap-3 text-xs text-slate-500 mt-1">
+                  <span>📞 ${m.phone || '연락처 없음'}</span>
+                  <span>•</span>
+                  <span>가입: ${dateStr}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2 self-end sm:self-auto">
+              <a href="tel:${cleanPhone}" class="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-bold transition-colors flex items-center gap-1 cursor-pointer">
+                <span>📞</span> 통화
+              </a>
+              <a href="sms:${cleanPhone}?body=${encodeURIComponent('[백재상례복] 안녕하세요 ' + (m.name || '회원') + '님, 백재상례복 회원 전담 안내드립니다.')}" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition-colors flex items-center gap-1 cursor-pointer">
+                <span>💬</span> 문자
+              </a>
+              <button type="button" onclick="deleteAdminMember('${m.id}')" class="p-1.5 text-slate-400 hover:text-red-500 rounded transition-colors cursor-pointer text-xs" title="회원 삭제">
+                🗑️ 삭제
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // 회원 삭제 처리
+    async function deleteAdminMember(id) {
+      if (!confirm("이 회원을 정말로 삭제(탈퇴) 처리하시겠습니까?")) return;
+
+      adminMembersData = adminMembersData.filter(m => String(m.id) !== String(id));
+      localStorage.setItem('baekjae_members', JSON.stringify(adminMembersData));
+
+      const activeSb = window.sbClient || (window.supabase && window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_KEY));
+      if (activeSb) {
+        try {
+          await activeSb.from('members').delete().eq('id', id);
+        } catch(e) {}
+      }
+
+      updateAdminMemberMetrics();
+      renderAdminMembersList(adminMembersData);
+      showToast("✓ 회원이 삭제되었습니다.");
+    }
 
     // 관리자 상품 목록 렌더링
     async function renderAdminProducts() {
