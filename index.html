@@ -767,30 +767,34 @@
                 <button type="button" onclick="quickInquiry('여성 양말/덧신')" class="w-full py-2 bg-slate-100 hover:bg-slate-900 hover:text-white text-slate-800 text-xs font-semibold rounded-xl transition-all cursor-pointer">
                   주문 / 견적
                 </button>
-              </div>
             </div>
 
-            <!-- [BENTO 안내 타일 카드]: 의전 맞춤 케어 & 긴급 상담 -->
-            <div class="col-span-1 bg-gradient-to-br from-slate-900 to-slate-800 text-white rounded-3xl p-6 shadow-sm flex flex-col justify-between border border-slate-700">
-              <div class="space-y-3">
-                <span class="inline-block bg-amber-400 text-slate-950 text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-full">
+          </div>
+        </div>
+
+        <!-- [전체 상품소개 하단 안내 배너]: 화면 크기에 100% 최적화된 풀사이즈 24시 긴급 의전 지원 카드 -->
+        <div class="w-full bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800 text-white rounded-3xl p-6 sm:p-8 lg:p-10 shadow-lg border border-slate-700/80 mt-10 transition-all">
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+            <div class="space-y-3 max-w-2xl">
+              <div class="flex items-center gap-2">
+                <span class="inline-block bg-amber-400 text-slate-950 text-xs font-extrabold uppercase px-3 py-1 rounded-full shadow-xs">
                   24시 긴급 의전 지원
                 </span>
-                <h4 class="text-lg font-serif font-bold text-white">전국 장례식장 당일 특급 배송</h4>
-                <p class="text-slate-300 text-xs leading-relaxed">
-                  갑작스러운 부고에도 당황하지 않으시도록, 유가족 체형에 맞는 상례복과 필수 부자재 일체를 즉시 전달해 드립니다.
-                </p>
+                <span class="text-xs text-amber-300 font-medium">전국 장례식장 100% 직배송</span>
               </div>
-              <div class="pt-4 space-y-2">
-                <a href="tel:010-3112-6730" class="w-full py-2.5 bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-1.5 shadow-sm">
-                  <span>📞</span> 긴급 직통 010-3112-6730
-                </a>
-                <button type="button" onclick="switchTab('inquiry')" class="w-full py-2 bg-white/10 hover:bg-white/20 text-white text-xs font-medium rounded-xl transition-colors cursor-pointer border border-white/20">
-                  1:1 온라인 문의 접수
-                </button>
-              </div>
+              <h4 class="text-2xl sm:text-3xl font-serif font-bold text-white tracking-tight">전국 장례식장 당일 특급 배송</h4>
+              <p class="text-slate-300 text-xs sm:text-sm leading-relaxed">
+                갑작스러운 부고에도 당황하지 않으시도록, 유가족 체형에 맞는 상례복과 필수 부자재 일체를 즉시 선별하여 가장 가까운 장례식장으로 긴급 배송해 드립니다.
+              </p>
             </div>
-
+            <div class="flex flex-col sm:flex-row lg:flex-col xl:flex-row gap-3 shrink-0 lg:w-auto w-full">
+              <a href="tel:010-3112-6730" class="w-full sm:w-auto px-6 py-3.5 bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs sm:text-sm font-bold rounded-2xl transition-all flex items-center justify-center gap-2 shadow-md hover:shadow-lg cursor-pointer">
+                <span class="text-base">📞</span> 긴급 직통 010-3112-6730
+              </a>
+              <button type="button" onclick="switchTab('inquiry')" class="w-full sm:w-auto px-6 py-3.5 bg-white/10 hover:bg-white/20 text-white text-xs sm:text-sm font-medium rounded-2xl transition-colors cursor-pointer border border-white/20 flex items-center justify-center gap-2">
+                <span>💬</span> 1:1 온라인 문의 접수
+              </button>
+            </div>
           </div>
         </div>
 
