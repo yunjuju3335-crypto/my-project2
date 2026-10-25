@@ -9,7 +9,7 @@ cd /d "C:\Users\권윤주\Desktop\homepage"
 set GIT_EXE="C:\Users\권윤주\AppData\Local\GitHubDesktop\app-3.6.7\resources\app\git\cmd\git.exe"
 
 echo [1/3] 변경사항 확인 및 스테이징 중...
-%GIT_EXE% add index.html gemini-code-1792323230706.html AdminDashboard.tsx images/ baekjae_shorts.mp4 home_model.jpg .agents/
+%GIT_EXE% add -A
 
 echo [2/3] 자동 커밋 생성 중...
 %GIT_EXE% commit -m "update: admin updated content and prices"
