@@ -6,13 +6,21 @@ if not exist "index.html" cd /d "%USERPROFILE%\Desktop\homepage"
 set "GIT_EXE=%LOCALAPPDATA%\GitHubDesktop\app-3.6.7\resources\app\git\cmd\git.exe"
 if not exist "%GIT_EXE%" set "GIT_EXE=%LOCALAPPDATA%\GitHubDesktop\app-3.6.6\resources\app\git\cmd\git.exe"
 
-echo [1/3] Staging changes...
+echo ========================================================
+echo  [1/3] Staging changes (git add -A)...
+echo ========================================================
 "%GIT_EXE%" add -A
 
-echo [2/3] Committing changes...
+echo.
+echo ========================================================
+echo  [2/3] Committing changes...
+echo ========================================================
 "%GIT_EXE%" commit -m "update: sync changes to github pages"
 
-echo [3/3] Pushing to GitHub Pages...
+echo.
+echo ========================================================
+echo  [3/3] Pushing to GitHub Pages (origin/main)...
+echo ========================================================
 "%GIT_EXE%" push origin main
 
 echo.
