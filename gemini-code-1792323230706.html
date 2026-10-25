@@ -1810,19 +1810,53 @@
   </div>
 
   <!-- 관리자 대시보드 모달 (Admin Modal) -->
-  <div id="adminModal" style="display: none;" class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl shadow-2xl border border-slate-200 w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden animate-fade-in">
+  <div id="adminModal" style="display: none;" class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4">
+    <div id="adminModalDialog" class="bg-white rounded-3xl shadow-2xl border border-slate-200 w-full max-w-4xl h-[88vh] max-h-[88vh] flex flex-col overflow-hidden animate-fade-in transition-all duration-300 ease-out">
       
-      <!-- 모달 상단 헤더 -->
-      <div class="p-6 bg-slate-900 text-white flex justify-between items-center shrink-0">
+      <!-- 모달 상단 헤더 (헤더 더블클릭 시 크게/복원 토글) -->
+      <div ondblclick="toggleAdminConsoleMaximize()" class="px-5 py-3.5 bg-slate-900 text-white flex justify-between items-center shrink-0 select-none border-b border-slate-800" title="헤더 더블클릭 시 콘솔 창 크기 확대/복원">
         <div class="flex items-center gap-3">
-          <span class="p-2 rounded-xl bg-slate-800 text-xl">🔐</span>
+          <span class="p-2 rounded-xl bg-slate-800 text-lg sm:text-xl shrink-0">🔐</span>
           <div>
-            <h3 class="text-lg font-bold">백재상례복 관리자 콘솔</h3>
-            <p class="text-xs text-slate-400">실시간 문의 및 상품 가격 관리</p>
+            <div class="flex items-center gap-2">
+              <h3 class="text-base sm:text-lg font-bold">백재상례복 관리자 콘솔</h3>
+              <span id="adminModalSizeBadge" class="hidden sm:inline-block text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">기본 크기</span>
+            </div>
+            <p class="text-xs text-slate-400">실시간 문의 및 회원·가격·FAQ 종합 제어</p>
           </div>
         </div>
-        <button type="button" onclick="closeAdminModal()" class="p-2 text-slate-400 hover:text-white transition-colors text-lg cursor-pointer">✕</button>
+
+        <!-- 윈도우 스타일 창 크기 조절 & 닫기 컨트롤 바 (-, □, ✕) -->
+        <div class="flex items-center gap-1 sm:gap-1.5 shrink-0" onclick="event.stopPropagation()">
+          <!-- 작게 버튼 (-) -->
+          <button type="button" id="adminSizeBtnSmall" onclick="toggleAdminConsoleSmall()" title="작게 (컴팩트 화면)" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-800 active:bg-slate-700 transition-colors cursor-pointer" aria-label="창 작게">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19 12H5"></path>
+            </svg>
+          </button>
+          
+          <!-- 크게/최대화 버튼 (□) -->
+          <button type="button" id="adminSizeBtnLarge" onclick="toggleAdminConsoleMaximize()" title="크게 (전체 화면)" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-800 active:bg-slate-700 transition-colors cursor-pointer" aria-label="창 크게">
+            <!-- 기본 상태: 단일 사각형 □ -->
+            <svg id="adminIconMaximize" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <rect x="4" y="4" width="16" height="16" rx="2"></rect>
+            </svg>
+            <!-- 최대화 상태: 겹친 사각형 ❐ -->
+            <svg id="adminIconRestore" class="w-4 h-4 hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8 4h10a2 2 0 0 1 2 2v10M4 8h10a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V10a2 2 0 0 1 2-2z"></path>
+            </svg>
+          </button>
+
+          <!-- 구분선 -->
+          <span class="w-px h-5 bg-slate-800 mx-0.5"></span>
+
+          <!-- 닫기 버튼 (✕) -->
+          <button type="button" onclick="closeAdminModal()" title="콘솔 닫기 (Esc)" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-red-400 hover:bg-red-950/40 active:bg-red-900/50 transition-colors cursor-pointer" aria-label="닫기">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
       </div>
 
       <!-- 1) 로그인 전 화면 -->
@@ -2633,11 +2667,86 @@
       console.warn("Supabase init note:", e);
     }
 
+    // --- 관리자 모달 창 크기 조절 (작게 / 기본 / 크게) ---
+    let adminModalSize = localStorage.getItem('baekjae_admin_modal_size') || 'normal';
+
+    function applyAdminModalSize(size) {
+      adminModalSize = size;
+      localStorage.setItem('baekjae_admin_modal_size', size);
+      
+      const dialog = document.getElementById('adminModalDialog');
+      const badge = document.getElementById('adminModalSizeBadge');
+      const btnSmall = document.getElementById('adminSizeBtnSmall');
+      const btnLarge = document.getElementById('adminSizeBtnLarge');
+      const iconMax = document.getElementById('adminIconMaximize');
+      const iconRest = document.getElementById('adminIconRestore');
+
+      if (!dialog) return;
+
+      // 크기 클래스 초기화
+      dialog.classList.remove(
+        'max-w-2xl', 'h-[78vh]', 'max-h-[78vh]',
+        'max-w-4xl', 'h-[88vh]', 'max-h-[88vh]',
+        'w-[98vw]', 'max-w-[98vw]', 'h-[96vh]', 'max-h-[96vh]', 'rounded-2xl'
+      );
+
+      // 버튼 활성 스타일 리셋
+      if (btnSmall) btnSmall.classList.remove('text-amber-400', 'bg-slate-800');
+      if (btnLarge) btnLarge.classList.remove('text-amber-400', 'bg-slate-800');
+      if (iconMax) iconMax.classList.remove('hidden');
+      if (iconRest) iconRest.classList.add('hidden');
+
+      if (size === 'small') {
+        // [1] 작게 (컴팩트 화면)
+        dialog.classList.add('w-full', 'max-w-2xl', 'h-[78vh]', 'max-h-[78vh]');
+        if (badge) badge.textContent = '작게 (컴팩트)';
+        if (btnSmall) {
+          btnSmall.classList.add('text-amber-400', 'bg-slate-800');
+          btnSmall.title = '기본 크기로 복원';
+        }
+        if (btnLarge) btnLarge.title = '크게 (전체 화면)';
+      } else if (size === 'large') {
+        // [2] 크게 (전체 화면 / 와이드)
+        dialog.classList.add('w-[98vw]', 'max-w-[98vw]', 'h-[96vh]', 'max-h-[96vh]', 'rounded-2xl');
+        if (badge) badge.textContent = '크게 (전체 화면)';
+        if (btnLarge) {
+          btnLarge.classList.add('text-amber-400', 'bg-slate-800');
+          btnLarge.title = '기본 크기로 복원';
+        }
+        if (iconMax) iconMax.classList.add('hidden');
+        if (iconRest) iconRest.classList.remove('hidden');
+        if (btnSmall) btnSmall.title = '작게 (컴팩트 화면)';
+      } else {
+        // [3] 기본 크기 (Normal)
+        dialog.classList.add('w-full', 'max-w-4xl', 'h-[88vh]', 'max-h-[88vh]');
+        if (badge) badge.textContent = '기본 크기';
+        if (btnSmall) btnSmall.title = '작게 (컴팩트 화면)';
+        if (btnLarge) btnLarge.title = '크게 (전체 화면)';
+      }
+    }
+
+    function toggleAdminConsoleSmall() {
+      if (adminModalSize === 'small') {
+        applyAdminModalSize('normal');
+      } else {
+        applyAdminModalSize('small');
+      }
+    }
+
+    function toggleAdminConsoleMaximize() {
+      if (adminModalSize === 'large') {
+        applyAdminModalSize('normal');
+      } else {
+        applyAdminModalSize('large');
+      }
+    }
+
     // 모달 열기
     function openAdminModal() {
       const modal = document.getElementById('adminModal');
       if (modal) {
         modal.style.display = 'flex';
+        applyAdminModalSize(adminModalSize);
         if (adminAuthed) {
           showAdminDashboard();
         } else {
@@ -2651,6 +2760,16 @@
       const modal = document.getElementById('adminModal');
       if (modal) modal.style.display = 'none';
     }
+
+    // ESC 키로 관리자 모달 닫기 지원
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        const modal = document.getElementById('adminModal');
+        if (modal && modal.style.display !== 'none') {
+          closeAdminModal();
+        }
+      }
+    });
 
     // 로그인 화면 표시
     function showAdminLogin() {
