@@ -352,11 +352,11 @@
               <span class="w-2.5 h-7 bg-slate-900 rounded-full"></span>
               <div>
                 <h3 class="text-2xl font-serif font-bold text-slate-900">상례복 남자 컬렉션</h3>
-                <p class="text-xs text-slate-500">큰 카드(남성 정장)와 전용 부자재(완장, 넥타이, 허리띠, 남성 양말)로 구성된 벤토 그리드</p>
+                <p class="text-xs text-slate-500">큰 카드(남성 정장, 와이셔츠, 넥타이)와 전용 부자재(완장 1·2, 허리띠, 남성 양말)로 구성된 벤토 그리드</p>
               </div>
             </div>
             <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 w-fit">
-              <span>👔</span> 남성 정장 & 필수 부자재 6종
+              <span>👔</span> 남성 정장 & 필수 부자재 7종
             </span>
           </div>
 
@@ -470,48 +470,54 @@
               </div>
             </div>
 
-            <!-- [작은 카드 - 남자 부자재 1]: am2 넥타이 -->
-            <div class="col-span-1 bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-md border border-slate-200 group transition-all flex flex-col justify-between">
-              <div id="drop-box-am2" class="w-full aspect-[4/3] bg-slate-100 flex items-center justify-center relative overflow-hidden cursor-pointer" ondragover="handleProductDragOver(event, 'am2')" ondragleave="handleProductDragLeave(event, 'am2')" ondrop="handleProductDrop(event, 'am2')" onclick="triggerProductFileInput('am2')">
-                <input type="file" id="file-input-am2" accept="image/*" class="hidden" onchange="handleProductFileSelect(event, 'am2')">
-                <img id="img-am2" src="images/product_am2.jpg" alt="넥타이" class="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500">
-                <div id="placeholder-am2" class="hidden flex flex-col items-center justify-center text-slate-400 p-4 text-center">
-                  <span class="text-3xl mb-1">👔</span>
-                  <span class="text-xs font-semibold text-slate-700">사진 등록</span>
-                </div>
-                <div class="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-[11px] font-medium pointer-events-none">
-                  <span class="bg-slate-900/90 px-2.5 py-1 rounded-full shadow-md">📷 사진 변경</span>
-                </div>
-                <button type="button" id="reset-btn-am2" onclick="resetSingleProductImage(event, 'am2')" class="absolute top-2 right-2 bg-slate-900/80 hover:bg-red-600 text-white text-[10px] px-2 py-0.5 rounded-md transition-colors shadow z-10">사진 초기화</button>
-                <span class="absolute top-2 left-2 bg-slate-900/90 text-white text-[10px] font-bold px-2 py-0.5 rounded-md shadow-xs">남성 부자재</span>
-              </div>
-              <div class="p-4 flex flex-col justify-between flex-grow">
-                <div>
-                  <div class="flex items-center justify-between mb-1">
-                    <h4 class="text-base font-bold text-slate-900">넥타이</h4>
-                    <span class="text-xs">👔</span>
+            <!-- [중형 카드 - 남자 3]: am2 넥타이 (와이셔츠와 크기 및 비율 동일) -->
+            <div class="col-span-1 md:col-span-2 lg:col-span-2 bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-md border border-slate-200 group transition-all flex flex-col justify-between">
+              <div class="flex flex-col sm:flex-row h-full">
+                <!-- 사진 영역: 와이셔츠와 동일한 크기 및 비율 (w-full sm:w-1/2 aspect-[4/3] sm:aspect-auto) -->
+                <div id="drop-box-am2" class="w-full sm:w-1/2 aspect-[4/3] sm:aspect-auto bg-slate-100 flex items-center justify-center relative overflow-hidden cursor-pointer shrink-0" ondragover="handleProductDragOver(event, 'am2')" ondragleave="handleProductDragLeave(event, 'am2')" ondrop="handleProductDrop(event, 'am2')" onclick="triggerProductFileInput('am2')">
+                  <input type="file" id="file-input-am2" accept="image/*" class="hidden" onchange="handleProductFileSelect(event, 'am2')">
+                  <img id="img-am2" src="images/product_am2.jpg" alt="넥타이" class="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500">
+                  <div id="placeholder-am2" class="hidden flex flex-col items-center justify-center text-slate-400 p-6 text-center">
+                    <div class="w-12 h-12 rounded-2xl bg-white border border-slate-200 shadow-xs flex items-center justify-center mb-2 text-2xl">👔</div>
+                    <span class="text-xs font-semibold text-slate-700">사진 등록</span>
                   </div>
-                  <p class="text-slate-500 text-xs mb-3 min-h-[32px]">무지 스타일 단정 검은색 넥타이</p>
-                  <!-- 판매가 기재란 -->
-                  <div class="flex items-center justify-between mb-3 bg-slate-50 p-2 rounded-xl border border-slate-100">
-                    <span class="text-[11px] font-semibold text-slate-500">판매가</span>
-                    <div class="flex items-center">
-                      <input type="text" id="price-am2" readonly class="price-input cursor-default w-20 text-right text-xs font-bold text-slate-900 bg-transparent border-b border-slate-300 focus:border-slate-800 focus:outline-none placeholder-slate-300" value="15,000" placeholder="금액 입력" onchange="savePrice('am2', this.value)">
-                      <span class="text-xs font-medium text-slate-800 ml-1">원</span>
+                  <div class="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-medium pointer-events-none">
+                    <span class="bg-slate-900/90 px-3 py-1.5 rounded-full shadow-md">📷 사진 변경</span>
+                  </div>
+                  <button type="button" id="reset-btn-am2" onclick="resetSingleProductImage(event, 'am2')" class="absolute top-2 right-2 bg-slate-900/80 hover:bg-red-600 text-white text-[10px] px-2 py-1 rounded-md transition-colors shadow z-10">사진 초기화</button>
+                  <span class="absolute top-2 left-2 bg-white/90 text-slate-800 text-[10px] font-bold px-2 py-0.5 rounded-md shadow-xs">남성 부자재</span>
+                </div>
+
+                <!-- 텍스트 & 가격 영역 -->
+                <div class="p-5 flex flex-col justify-between flex-grow">
+                  <div>
+                    <div class="flex items-center justify-between mb-1">
+                      <h4 class="text-lg font-bold text-slate-900">넥타이</h4>
+                      <span class="text-base">👔</span>
+                    </div>
+                    <p class="text-slate-500 text-xs mb-3 leading-relaxed">무지 스타일의 단정하고 고급스러운 검은색 정품 넥타이</p>
+                    
+                    <!-- 판매가 기재란 -->
+                    <div class="flex items-center justify-between mb-3 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                      <span class="text-[11px] font-semibold text-slate-500">판매가</span>
+                      <div class="flex items-center">
+                        <input type="text" id="price-am2" readonly class="price-input cursor-default w-24 text-right text-sm font-bold text-slate-900 bg-transparent border-b border-slate-300 focus:border-slate-800 focus:outline-none placeholder-slate-300" value="15,000" placeholder="금액 입력" onchange="savePrice('am2', this.value)">
+                        <span class="text-xs font-medium text-slate-800 ml-1">원</span>
+                      </div>
                     </div>
                   </div>
+                  <button type="button" onclick="quickInquiry('넥타이')" class="w-full py-2.5 bg-slate-100 hover:bg-slate-900 hover:text-white text-slate-800 text-xs font-semibold rounded-xl transition-all cursor-pointer">
+                    넥타이 주문 문의
+                  </button>
                 </div>
-                <button type="button" onclick="quickInquiry('넥타이')" class="w-full py-2 bg-slate-100 hover:bg-slate-900 hover:text-white text-slate-800 text-xs font-semibold rounded-xl transition-all cursor-pointer">
-                  주문 / 견적
-                </button>
               </div>
             </div>
 
-            <!-- [작은 카드 - 남자 부자재 2]: am1 완장 -->
+            <!-- [작은 카드 - 남자 부자재 1]: am1 완장 1 -->
             <div class="col-span-1 bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-md border border-slate-200 group transition-all flex flex-col justify-between">
               <div id="drop-box-am1" class="w-full aspect-[4/3] bg-slate-100 flex items-center justify-center relative overflow-hidden cursor-pointer" ondragover="handleProductDragOver(event, 'am1')" ondragleave="handleProductDragLeave(event, 'am1')" ondrop="handleProductDrop(event, 'am1')" onclick="triggerProductFileInput('am1')">
                 <input type="file" id="file-input-am1" accept="image/*" class="hidden" onchange="handleProductFileSelect(event, 'am1')">
-                <img id="img-am1" src="images/product_am1.jpg" alt="완장" class="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500">
+                <img id="img-am1" src="images/product_am1.jpg" alt="완장 1" class="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500">
                 <div id="placeholder-am1" class="hidden flex flex-col items-center justify-center text-slate-400 p-4 text-center">
                   <span class="text-3xl mb-1">🎗️</span>
                   <span class="text-xs font-semibold text-slate-700">사진 등록</span>
@@ -525,10 +531,10 @@
               <div class="p-4 flex flex-col justify-between flex-grow">
                 <div>
                   <div class="flex items-center justify-between mb-1">
-                    <h4 class="text-base font-bold text-slate-900">완장</h4>
+                    <h4 class="text-base font-bold text-slate-900">완장 1</h4>
                     <span class="text-xs">🎗️</span>
                   </div>
-                  <p class="text-slate-500 text-xs mb-3 min-h-[32px]">상주를 표시하는 전통 규격 완장</p>
+                  <p class="text-slate-500 text-xs mb-3 min-h-[32px]">상제 및 복인을 위한 전통 규격 완장</p>
                   <!-- 판매가 기재란 -->
                   <div class="flex items-center justify-between mb-3 bg-slate-50 p-2 rounded-xl border border-slate-100">
                     <span class="text-[11px] font-semibold text-slate-500">판매가</span>
@@ -538,7 +544,44 @@
                     </div>
                   </div>
                 </div>
-                <button type="button" onclick="quickInquiry('완장')" class="w-full py-2 bg-slate-100 hover:bg-slate-900 hover:text-white text-slate-800 text-xs font-semibold rounded-xl transition-all cursor-pointer">
+                <button type="button" onclick="quickInquiry('완장 1')" class="w-full py-2 bg-slate-100 hover:bg-slate-900 hover:text-white text-slate-800 text-xs font-semibold rounded-xl transition-all cursor-pointer">
+                  주문 / 견적
+                </button>
+              </div>
+            </div>
+
+            <!-- [작은 카드 - 남자 부자재 2]: am5 완장 2 -->
+            <div class="col-span-1 bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-md border border-slate-200 group transition-all flex flex-col justify-between">
+              <div id="drop-box-am5" class="w-full aspect-[4/3] bg-slate-100 flex items-center justify-center relative overflow-hidden cursor-pointer" ondragover="handleProductDragOver(event, 'am5')" ondragleave="handleProductDragLeave(event, 'am5')" ondrop="handleProductDrop(event, 'am5')" onclick="triggerProductFileInput('am5')">
+                <input type="file" id="file-input-am5" accept="image/*" class="hidden" onchange="handleProductFileSelect(event, 'am5')">
+                <img id="img-am5" src="images/product_am5.jpg" alt="완장 2" class="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500" onerror="this.onerror=null; this.src='images/product_am1.jpg';">
+                <div id="placeholder-am5" class="hidden flex flex-col items-center justify-center text-slate-400 p-4 text-center">
+                  <span class="text-3xl mb-1">🎗️</span>
+                  <span class="text-xs font-semibold text-slate-700">사진 등록</span>
+                </div>
+                <div class="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-[11px] font-medium pointer-events-none">
+                  <span class="bg-slate-900/90 px-2.5 py-1 rounded-full shadow-md">📷 사진 변경</span>
+                </div>
+                <button type="button" id="reset-btn-am5" onclick="resetSingleProductImage(event, 'am5')" class="absolute top-2 right-2 bg-slate-900/80 hover:bg-red-600 text-white text-[10px] px-2 py-0.5 rounded-md transition-colors shadow z-10">사진 초기화</button>
+                <span class="absolute top-2 left-2 bg-slate-900/90 text-white text-[10px] font-bold px-2 py-0.5 rounded-md shadow-xs">남성 부자재</span>
+              </div>
+              <div class="p-4 flex flex-col justify-between flex-grow">
+                <div>
+                  <div class="flex items-center justify-between mb-1">
+                    <h4 class="text-base font-bold text-slate-900">완장 2</h4>
+                    <span class="text-xs">🎗️</span>
+                  </div>
+                  <p class="text-slate-500 text-xs mb-3 min-h-[32px]">상주(주상)를 표시하는 전통 규격 완장</p>
+                  <!-- 판매가 기재란 -->
+                  <div class="flex items-center justify-between mb-3 bg-slate-50 p-2 rounded-xl border border-slate-100">
+                    <span class="text-[11px] font-semibold text-slate-500">판매가</span>
+                    <div class="flex items-center">
+                      <input type="text" id="price-am5" readonly class="price-input cursor-default w-20 text-right text-xs font-bold text-slate-900 bg-transparent border-b border-slate-300 focus:border-slate-800 focus:outline-none placeholder-slate-300" value="" placeholder="금액 입력" onchange="savePrice('am5', this.value)">
+                      <span class="text-xs font-medium text-slate-800 ml-1">원</span>
+                    </div>
+                  </div>
+                </div>
+                <button type="button" onclick="quickInquiry('완장 2')" class="w-full py-2 bg-slate-100 hover:bg-slate-900 hover:text-white text-slate-800 text-xs font-semibold rounded-xl transition-all cursor-pointer">
                   주문 / 견적
                 </button>
               </div>
@@ -1210,7 +1253,8 @@
       m2: 'images/product_m2.jpg',
       w1: 'images/product_w1.jpg',
       am1: 'images/product_am1.jpg',
-      am2: 'images/product_am2.jpg'
+      am2: 'images/product_am2.jpg',
+      am5: 'images/product_am5.jpg'
     };
 
     let savedPrices = {};
@@ -1235,6 +1279,7 @@
         am2: '15,000',
         am3: '20,000',
         am4: '',
+        am5: '',
         aw1: '',
         aw2: ''
       };
@@ -2978,8 +3023,9 @@
       { id: 'm1', name: '상·하의 양복 (남)' },
       { id: 'm2', name: '와이셔츠' },
       { id: 'w1', name: '개량 한복 (여)' },
-      { id: 'am1', name: '완장' },
       { id: 'am2', name: '넥타이' },
+      { id: 'am1', name: '완장 1' },
+      { id: 'am5', name: '완장 2' },
       { id: 'am3', name: '허리띠' },
       { id: 'am4', name: '남성 양말' },
       { id: 'aw1', name: '머리핀' },
