@@ -228,7 +228,7 @@
             <div class="relative w-full max-w-[310px] mx-auto aspect-[9/16] bg-slate-950 rounded-2xl overflow-hidden shadow-2xl border-4 border-slate-800 flex items-center justify-center group" id="playerContainer">
               <video id="shortsVideo" src="baekjae_shorts.mp4" class="w-full h-full object-cover" autoplay loop muted playsinline></video>
               <iframe id="youtubeIframe" class="w-full h-full border-0 hidden" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-              <div id="videoOverlay" class="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/80 pointer-events-none"></div>
+              <div id="videoOverlay" class="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-transparent pointer-events-none"></div>
 
               <!-- 상단 컨트롤러 -->
               <div id="topControls" class="absolute top-3 inset-x-3 flex items-center justify-between z-20">
@@ -240,7 +240,7 @@
               </div>
 
               <!-- 우측 리액션 컨트롤러 -->
-              <div id="rightControls" class="absolute right-2.5 bottom-16 flex flex-col items-center gap-3.5 z-20">
+              <div id="rightControls" class="absolute right-2.5 bottom-4 flex flex-col items-center gap-3 z-20">
                 <button type="button" id="likeBtn" class="flex flex-col items-center cursor-pointer">
                   <div id="heartIconBox" class="p-2.5 rounded-full bg-black/50 text-white hover:bg-black/70 backdrop-blur-md transition-all text-sm">🤍</div>
                   <span id="likeCount" class="text-[11px] text-white mt-1 font-medium drop-shadow">128</span>
@@ -250,16 +250,19 @@
                   <span id="shareText" class="text-[11px] text-white mt-1 font-medium drop-shadow">공유</span>
                 </button>
               </div>
+            </div>
 
-              <!-- 하단 캡션 -->
-              <div id="captionArea" class="absolute bottom-3 inset-x-3 text-white z-20 pointer-events-none">
-                <div class="flex items-center gap-2 mb-1">
-                  <span class="w-5 h-5 rounded-full bg-slate-800 border border-slate-600 flex items-center justify-center text-[10px] font-bold">백</span>
-                  <span class="text-xs font-semibold drop-shadow">@백재상례복</span>
+            <!-- 쇼츠 영상 아래 흰 여백 표시 영역 (쇼츠 자막을 가리지 않도록 비디오 하단 외부 배치) -->
+            <div id="captionArea" class="mt-3.5 max-w-[310px] mx-auto w-full bg-slate-50/90 p-3.5 rounded-2xl border border-slate-200/80 shadow-2xs">
+              <div class="flex items-center justify-between gap-2 mb-1.5">
+                <div class="flex items-center gap-2">
+                  <span class="w-6 h-6 rounded-full bg-slate-900 text-white flex items-center justify-center text-[10px] font-bold shadow-2xs">백</span>
+                  <span class="text-xs font-bold text-slate-800">@백재상례복</span>
                 </div>
-                <p id="captionText" class="text-xs text-slate-100 font-light drop-shadow leading-snug line-clamp-2">백재상례복 정통 의전 및 착용 안내</p>
-                <p class="text-[10px] text-slate-300 mt-1 font-medium">#백재상례복 #장례예절 #상례복안내</p>
+                <span class="text-[10px] font-semibold text-red-600 bg-red-50 border border-red-100 px-2 py-0.5 rounded-full">공식 가이드</span>
               </div>
+              <p id="captionText" class="text-xs font-bold text-slate-800 leading-snug">백재 상례복 의전 및 착용안내</p>
+              <p class="text-[11px] text-slate-500 mt-1 font-medium">#백재상례복 #장례예절 #상례복안내</p>
             </div>
           </div>
 
@@ -1667,7 +1670,7 @@
         video.play().catch(() => {});
         if (playBtn) playBtn.textContent = '⏸';
         if (videoBadge) videoBadge.textContent = 'OFFICIAL GUIDE';
-        if (captionText) captionText.textContent = '상례복 바르게 입는 법 & 완장 착용 예절 가이드';
+        if (captionText) captionText.textContent = '백재 상례복 의전 및 착용안내';
         if (uploadNotice) {
           uploadNotice.textContent = '올리신 영상은 브라우저에 영구 보존되어 다음 방문 시에도 그대로 재생됩니다';
           uploadNotice.classList.remove('text-green-600');
